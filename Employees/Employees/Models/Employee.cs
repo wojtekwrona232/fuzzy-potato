@@ -40,7 +40,7 @@ namespace Employees.Models
 
         [Required] [DataType(DataType.Date)] public DateTime DateOfBirth { get; set; }
         [Required] [DataType(DataType.Date)] public DateTime DateOfHire { get; set; }
-        [Required] [DataType(DataType.Date)] public DateTime DateOfDismission { get; set; }
+        [DataType(DataType.Date)] public DateTime DateOfDismission { get; set; }
         
         [Required] [Range(0.0, Double.PositiveInfinity)] public double Salary { get; set; }
 

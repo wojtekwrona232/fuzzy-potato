@@ -43,11 +43,11 @@ namespace Employees.Controllers
             }).ToListAsync();
         }
 
-        [HttpGet("all/paged/{pageNumber}&{pageSize}")]
-        public async Task<ActionResult<EmployeeBasicDataPaged<List<EmployeeBasicDataDto>>>> GetAllEmployeesBasic(int pageNumber, int pageSize)
+        [HttpGet("all/paged")]
+        public async Task<IActionResult> GetAllEmployeesBasic([FromQuery] PaginationFilter filter)
         {
             var route = Request.Path.Value;
-            var paginationFilter = new PaginationFilter(pageNumber, pageSize);
+            var paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
             var query = await _context.Employees
                 .Skip((paginationFilter.PageNumber - 1) * paginationFilter.PageSize)
                 .Take(paginationFilter.PageSize)
@@ -62,7 +62,7 @@ namespace Employees.Controllers
                 }).ToListAsync();
             var totalRec = await _context.Employees.CountAsync();
             var paged = PaginationHelper.CreatePagedReponse<EmployeeBasicDataDto>(query, paginationFilter, totalRec, _uriService, route);
-            return new EmployeeBasicDataPaged<List<EmployeeBasicDataDto>>(query, paginationFilter.PageNumber, paginationFilter.PageSize);
+            return Ok(paged);
         }
 
         [HttpPut("address/{id}/{street}&{zipCode}&{city}&{region}&{country}")]
@@ -185,6 +185,60 @@ namespace Employees.Controllers
             return user;
         }
         
+        [HttpPut("date-hire/{id}/{date}")]
+        public async Task<ActionResult<Employee>> ChangeDateHire(Guid id, [DateWithinMonth] DateTime date)
+        {
+            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.DateOfHire = date;
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+       
+        [HttpPut("date-dismission/{id}/{date}")]
+        public async Task<ActionResult<Employee>> ChangeDateDismission(Guid id, [DateWithinMonth] DateTime date)
+        {
+            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.DateOfDismission = date;
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+        
+        [HttpPut("salary/{id}/{salary}")]
+        public async Task<ActionResult<Employee>> ChangeSalary(Guid id, [Range(0, Double.PositiveInfinity)] double salary)
+        {
+            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Salary = salary;
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+        
         [HttpPut("email/{id}/{email}")]
         public async Task<ActionResult<Employee>> ChangeEmail(Guid id, [EmailAddress] string email)
         {
@@ -196,6 +250,42 @@ namespace Employees.Controllers
             }
 
             user.Email = email;
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+        
+        [HttpPut("phone-number/{id}/{phoneNumber}")]
+        public async Task<ActionResult<Employee>> ChangePhoneNumber(Guid id, [Phone] string phoneNumber)
+        {
+            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.PhoneNumber = phoneNumber;
+
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+        
+        [HttpPut("possition/{id}/{possition}")]
+        public async Task<ActionResult<Employee>> ChangePossition(Guid id, [MinLength(1)] [MaxLength(64)] string possition)
+        {
+            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Position = possition;
 
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
