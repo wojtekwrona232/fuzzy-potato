@@ -27,6 +27,22 @@ namespace Employees.Database
                 .WithOne(p => p.Employee)
                 .HasForeignKey<Address>(p => p.EmployeeId)
                 .IsRequired();
+
+            modelBuilder.Entity<Employee>()
+                .Property(p => p.Salary)
+                .HasPrecision(2);
+
+            modelBuilder.Entity<Employee>()
+                .Property(p => p.DateOfBirth)
+                .HasColumnType("date");
+
+            modelBuilder.Entity<Employee>()
+                .Property(p => p.DateOfDismission)
+                .HasColumnType("date");
+
+            modelBuilder.Entity<Employee>()
+                .Property(p => p.DateOfHire)
+                .HasColumnType("date");
         }
 
     }
