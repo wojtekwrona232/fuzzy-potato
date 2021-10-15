@@ -10,6 +10,7 @@ using MailKit.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
+using MimeKit.Text;
 
 namespace Emails.Controllers
 {
@@ -19,31 +20,45 @@ namespace Emails.Controllers
     {
         [RequireHttps]
         [HttpPost]
-        public async Task<IActionResult> SendEmail([ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto, IList<IFormFile> files)
+        public async Task<IActionResult> SendEmail(
+            [ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto, 
+            IList<IFormFile> files, 
+            Boolean? isRichText, 
+            Boolean? isHtml)
         {
+            if (dto is null)
+            {
+                throw new ArgumentNullException(nameof(dto));
+            }
+
+            if (files is null)
+            {
+                throw new ArgumentNullException(nameof(files));
+            }
+
             var mailAddress = "ozqsfvppy2@outlook.com";
             var mailPassword = "!e*4j7&b*3J5uwHy4%C#9GVS32LG%728";
 
             var recipients = new InternetAddressList();
-            foreach(var rcpt in dto.Recipients)
+            foreach (var rcpt in dto.Recipients)
             {
                 recipients.Add(MailboxAddress.Parse(rcpt));
             }
-            
+
             var ccs = new InternetAddressList();
-            foreach(var rcpt in dto.Ccs)
+            foreach (var rcpt in dto.Ccs)
             {
                 ccs.Add(MailboxAddress.Parse(rcpt));
             }
 
             var bccs = new InternetAddressList();
-            foreach(var rcpt in dto.Bccs)
+            foreach (var rcpt in dto.Bccs)
             {
                 bccs.Add(MailboxAddress.Parse(rcpt));
             }
 
             long sizeOfFiles = 0;
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 sizeOfFiles += file.Length;
             }
@@ -54,10 +69,27 @@ namespace Emails.Controllers
             }
 
             var multipart = new Multipart("mixed");
-            multipart.Add(new TextPart("plain")
+
+            if (isRichText == true)
             {
-                Text = dto.Body + "\n" + dto.Signature
-            });
+                multipart.Add(new TextPart(TextFormat.RichText)
+                {
+                    Text = dto.Body + "\n" + dto.Signature
+                });
+            }
+            if (isHtml == true) {
+                multipart.Add(new TextPart(TextFormat.RichText)
+                {
+                    Text = dto.Body + "\n" + dto.Signature
+                });
+            }
+            if ((isHtml == false || isHtml == null) && (isRichText == false || isRichText == null)) {
+                multipart.Add(new TextPart(TextFormat.Plain)
+                {
+                    Text = dto.Body + "\n" + dto.Signature
+                });
+            }
+
             foreach(var file in files)
             {
                 var stream = file.OpenReadStream();
