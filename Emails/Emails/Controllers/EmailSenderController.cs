@@ -20,11 +20,8 @@ namespace Emails.Controllers
     {
         [RequireHttps]
         [HttpPost]
-        public async Task<IActionResult> SendEmail(
-            [ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto, 
-            IList<IFormFile> files, 
-            Boolean? isRichText, 
-            Boolean? isHtml)
+        public async Task<IActionResult> SendEmail([ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto, 
+            IList<IFormFile> files, Boolean? isRichText, Boolean? isHtml)
         {
             if (dto is null)
             {
@@ -70,6 +67,20 @@ namespace Emails.Controllers
 
             var multipart = new Multipart("mixed");
 
+            if ((isHtml == false || isHtml == null) && (isRichText == false || isRichText == null))
+            {
+                multipart.Add(new TextPart(TextFormat.Plain)
+                {
+                    Text = dto.Body + "\n" + dto.Signature
+                });
+            }
+            if (isHtml == true && isRichText == true)
+            {
+                multipart.Add(new TextPart(TextFormat.Html)
+                {
+                    Text = dto.Body + "\n" + dto.Signature
+                });
+            }
             if (isRichText == true)
             {
                 multipart.Add(new TextPart(TextFormat.RichText)
@@ -78,13 +89,7 @@ namespace Emails.Controllers
                 });
             }
             if (isHtml == true) {
-                multipart.Add(new TextPart(TextFormat.RichText)
-                {
-                    Text = dto.Body + "\n" + dto.Signature
-                });
-            }
-            if ((isHtml == false || isHtml == null) && (isRichText == false || isRichText == null)) {
-                multipart.Add(new TextPart(TextFormat.Plain)
+                multipart.Add(new TextPart(TextFormat.Html)
                 {
                     Text = dto.Body + "\n" + dto.Signature
                 });
@@ -106,7 +111,6 @@ namespace Emails.Controllers
                 multipart.Add(attachment);
                 memoryStream.Position = 0;
             }
-
 
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(mailAddress));

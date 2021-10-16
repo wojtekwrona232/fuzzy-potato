@@ -14,6 +14,6 @@ namespace Emails.Dtos
         public ICollection<string> Bccs { get; set; }   // blind carbon copy
         [Required] [MinLength(1)] [MaxLength(128)] public string Subject { get; set; }
         [Required] [MinLength(1)] [MaxLength(32768)] public string Body { get; set; }
-        public string Signature { get; set; }
+        [MinLength(1)] [MaxLength(256)] public string Signature { get; set; }
     }
 }
