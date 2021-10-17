@@ -4,9 +4,7 @@ using Employees.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Employees.Models;
@@ -43,6 +41,76 @@ namespace Employees.Controllers
             }).ToListAsync();
         }
 
+        [HttpGet("all/filter")]
+        public async Task<ActionResult<ICollection<EmployeeBasicDataDto>>> GetAllEmployeesBasicFiltered(string? email, string? firstName,
+            string? lastName, string? phoneNumber, string? position, int? orderBy, bool orderByDesc)
+        {
+            return orderByDesc ? 
+                await _context.Employees
+                    .Where(p => EF.Functions.ILike(p.Email, email) || EF.Functions.ILike(p.FirstName, firstName) ||
+                        EF.Functions.ILike(p.LastName, lastName) || EF.Functions.ILike(p.PhoneNumber, phoneNumber) ||
+                        EF.Functions.ILike(p.Position, position))
+                    .OrderByDescending(p => orderBy == 1 ? p.FirstName : 
+                        orderBy == 2 ? p.LastName : 
+                        orderBy == 3 ? p.Email : 
+                        orderBy == 4 ? p.PhoneNumber : 
+                        orderBy == 5 ? p.Position : null)
+                    .Select(p => new EmployeeBasicDataDto
+                    {
+                        Id = p.Id,
+                        FirstName = p.FirstName,
+                        LastName = p.LastName,
+                        Email = p.Email,
+                        PhoneNumber = p.PhoneNumber,
+                        Position = p.Position
+                    }).ToListAsync() : 
+                await _context.Employees
+                    .Where(p => EF.Functions.ILike(p.Email, email) || EF.Functions.ILike(p.FirstName, firstName) ||
+                        EF.Functions.ILike(p.LastName, lastName) || EF.Functions.ILike(p.PhoneNumber, phoneNumber) ||
+                        EF.Functions.ILike(p.Position, position))
+                    .OrderBy(p => orderBy == 1 ? p.FirstName :
+                        orderBy == 2 ? p.LastName :
+                        orderBy == 3 ? p.Email :
+                        orderBy == 4 ? p.PhoneNumber :
+                        orderBy == 5 ? p.Position : null)
+                    .Select(p => new EmployeeBasicDataDto
+                    {
+                        Id = p.Id,
+                        FirstName = p.FirstName,
+                        LastName = p.LastName,
+                        Email = p.Email,
+                        PhoneNumber = p.PhoneNumber,
+                        Position = p.Position
+                    }).ToListAsync();
+        }
+
+        [HttpGet("all/emails")]
+        public async Task<ActionResult<ICollection<EmployeeEmailDto>>> GetAllEmployeesEmails()
+        {
+            return await _context.Employees.Select(p => new EmployeeEmailDto
+            {
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                Email = p.Email
+            }).ToListAsync();
+        }
+        
+        [HttpGet("all/emails/filter")]
+        public async Task<ActionResult<ICollection<EmployeeEmailDto>>> GetAllEmployeesEmailsFiltered(string? email, string? firstName, string? lastName)
+        {
+            return await _context.Employees
+                .Where(p => EF.Functions.ILike(p.Email, email) || EF.Functions.ILike(p.FirstName, firstName) ||
+                    EF.Functions.ILike(p.LastName, lastName))
+                .OrderBy(p => p.FirstName)
+                .ThenBy(p => p.LastName)
+                .Select(p => new EmployeeEmailDto
+                {
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Email = p.Email
+                }).ToListAsync();
+        }
+
         [HttpGet("all/paged")]
         public async Task<IActionResult> GetAllEmployeesBasic([FromQuery] PaginationFilter filter)
         {
@@ -64,7 +132,59 @@ namespace Employees.Controllers
             var paged = PaginationHelper.CreatePagedReponse<EmployeeBasicDataDto>(query, paginationFilter, totalRec, _uriService, route);
             return Ok(paged);
         }
-
+        
+        [HttpGet("all/paged/filter")]
+        public async Task<IActionResult> GetAllEmployeesBasicFiltered([FromQuery] PaginationFilter filter, string? email, string? firstName,
+            string? lastName, string? phoneNumber, string? position, int? orderBy, bool orderByDesc)
+        {
+            var route = Request.Path.Value;
+            var paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+            var query =  orderByDesc ? 
+                await _context.Employees
+                    .Skip((paginationFilter.PageNumber - 1) * paginationFilter.PageSize)
+                    .Take(paginationFilter.PageSize)
+                    .Where(p => EF.Functions.ILike(p.Email, email) || EF.Functions.ILike(p.FirstName, firstName) ||
+                        EF.Functions.ILike(p.LastName, lastName) || EF.Functions.ILike(p.PhoneNumber, phoneNumber) ||
+                        EF.Functions.ILike(p.Position, position))
+                    .OrderByDescending(p => orderBy == 1 ? p.FirstName :
+                        orderBy == 2 ? p.LastName :
+                        orderBy == 3 ? p.Email :
+                        orderBy == 4 ? p.PhoneNumber :
+                        orderBy == 5 ? p.Position : null)
+                    .Select(p => new EmployeeBasicDataDto
+                    {
+                        Id = p.Id,
+                        FirstName = p.FirstName,
+                        LastName = p.LastName,
+                        Email = p.Email,
+                        PhoneNumber = p.PhoneNumber,
+                        Position = p.Position
+                    }).ToListAsync() : 
+                await _context.Employees
+                    .Skip((paginationFilter.PageNumber - 1) * paginationFilter.PageSize)
+                    .Take(paginationFilter.PageSize)
+                    .Where(p => EF.Functions.ILike(p.Email, email) || EF.Functions.ILike(p.FirstName, firstName) ||
+                            EF.Functions.ILike(p.LastName, lastName) || EF.Functions.ILike(p.PhoneNumber, phoneNumber) ||
+                            EF.Functions.ILike(p.Position, position))
+                    .OrderBy(p => orderBy == 1 ? p.FirstName :
+                        orderBy == 2 ? p.LastName :
+                        orderBy == 3 ? p.Email :
+                        orderBy == 4 ? p.PhoneNumber :
+                        orderBy == 5 ? p.Position : null)
+                    .Select(p => new EmployeeBasicDataDto
+                    {
+                        Id = p.Id,
+                        FirstName = p.FirstName,
+                        LastName = p.LastName,
+                        Email = p.Email,
+                        PhoneNumber = p.PhoneNumber,
+                        Position = p.Position
+                    }).ToListAsync();
+            var totalRec = await _context.Employees.CountAsync();
+            var paged = PaginationHelper.CreatePagedReponse<EmployeeBasicDataDto>(query, paginationFilter, totalRec, _uriService, route);
+            return Ok(paged);
+        }
+        
         [HttpPut("address/{id}/{street}&{zipCode}&{city}&{region}&{country}")]
         public async Task<ActionResult<Address>> ChangeLocation(Guid id, string street, string zipCode, string city, string region, string country)
         {
