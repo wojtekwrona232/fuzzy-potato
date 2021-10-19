@@ -20,21 +20,15 @@ namespace Emails.Controllers
     {
         [RequireHttps]
         [HttpPost]
-        public async Task<IActionResult> SendEmail([ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto, 
-            IList<IFormFile> files, Boolean? isRichText, Boolean? isHtml)
+        public async Task<IActionResult> SendEmail([ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto, IList<IFormFile>? files)
         {
             if (dto is null)
             {
                 throw new ArgumentNullException(nameof(dto));
             }
 
-            if (files is null)
-            {
-                throw new ArgumentNullException(nameof(files));
-            }
-
-            var mailAddress = "ozqsfvppy2@outlook.com";
-            var mailPassword = "!e*4j7&b*3J5uwHy4%C#9GVS32LG%728";
+            var mailAddress = "apitestinguser69@gmail.com";
+            var mailPassword = "5LT98wssY4675x7SV9mRAxt75EY6shUA67K9MNoxcD";
 
             var recipients = new InternetAddressList();
             foreach (var rcpt in dto.Recipients)
@@ -65,37 +59,10 @@ namespace Emails.Controllers
                 return StatusCode(413, "Attachments are too large. Total limit is 20MB.");
             }
 
-            var multipart = new Multipart("mixed");
+            var multipart = new MimeMessage();
+            var bodyBuilder = new BodyBuilder();
 
-            if ((isHtml == false || isHtml == null) && (isRichText == false || isRichText == null))
-            {
-                multipart.Add(new TextPart(TextFormat.Plain)
-                {
-                    Text = dto.Body + "\n" + dto.Signature
-                });
-            }
-            if (isHtml == true && isRichText == true)
-            {
-                multipart.Add(new TextPart(TextFormat.Html)
-                {
-                    Text = dto.Body + "\n" + dto.Signature
-                });
-            }
-            if (isRichText == true)
-            {
-                multipart.Add(new TextPart(TextFormat.RichText)
-                {
-                    Text = dto.Body + "\n" + dto.Signature
-                });
-            }
-            if (isHtml == true) {
-                multipart.Add(new TextPart(TextFormat.Html)
-                {
-                    Text = dto.Body + "\n" + dto.Signature
-                });
-            }
-
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 var stream = file.OpenReadStream();
                 var memoryStream = new MemoryStream();
@@ -108,9 +75,12 @@ namespace Emails.Controllers
                     ContentTransferEncoding = ContentEncoding.Base64,
                     FileName = file.FileName
                 };
-                multipart.Add(attachment);
+                bodyBuilder.Attachments.Add(attachment);
                 memoryStream.Position = 0;
             }
+
+            bodyBuilder.HtmlBody = dto.Body + "\n" + dto.Signature;
+            multipart.Body = bodyBuilder.ToMessageBody();
 
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(mailAddress));
@@ -118,11 +88,11 @@ namespace Emails.Controllers
             email.Cc.AddRange(ccs);
             email.Bcc.AddRange(bccs);
             email.Subject = dto.Subject;
-            email.Body = multipart;
+            email.Body = bodyBuilder.ToMessageBody();
 
             using (var smtp = new SmtpClient())
             {
-                await smtp.ConnectAsync("smtp.office365.com", 587, SecureSocketOptions.StartTls);
+                await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
                 await smtp.AuthenticateAsync(mailAddress, mailPassword);
                 await smtp.SendAsync(email);
                 await smtp.DisconnectAsync(true);
