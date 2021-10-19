@@ -66,7 +66,10 @@ namespace Employees
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Employees v1"));
             }
 
-            PrepDb.ExecuteMigration(app);
+            #region migrations
+            //uncoment this line to create the database and add 2k example records into the database
+            //PrepDb.ExecuteMigration(app);
+            #endregion
 
             app.UseHttpsRedirection();
 

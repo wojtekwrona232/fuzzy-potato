@@ -15,9 +15,8 @@ namespace Employees.Models
         [MaxLength(48)]
         public string Street { get; set; }
 
-        [Required]
         [MinLength(1)]
-        [MaxLength(10)]
+        [MaxLength(16)]
         public string ZipCode { get; set; }
 
         [Required]
@@ -25,7 +24,6 @@ namespace Employees.Models
         [MaxLength(48)]
         public string City { get; set; }
 
-        [Required]
         [MinLength(1)]
         [MaxLength(48)]
         public string Region { get; set; }

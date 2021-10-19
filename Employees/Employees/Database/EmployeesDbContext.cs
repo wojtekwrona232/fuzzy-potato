@@ -43,6 +43,14 @@ namespace Employees.Database
             modelBuilder.Entity<Employee>()
                 .Property(p => p.DateOfHire)
                 .HasColumnType("date");
+
+            modelBuilder.Entity<Employee>()
+                .HasIndex(p => p.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Employee>()
+                .HasIndex(p => p.PhoneNumber)
+                .IsUnique();
         }
 
     }

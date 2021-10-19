@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Employees.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class DateTypeChange2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,10 +17,10 @@ namespace Employees.Migrations
                     Email = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     PhoneNumber = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
                     Gender = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    DateOfBirth = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    DateOfHire = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    DateOfDismission = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    Salary = table.Column<double>(type: "double precision", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
+                    DateOfHire = table.Column<DateTime>(type: "date", nullable: false),
+                    DateOfDismission = table.Column<DateTime>(type: "date", nullable: false),
+                    Salary = table.Column<double>(type: "double precision", precision: 2, nullable: false),
                     Position = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
@@ -34,9 +34,9 @@ namespace Employees.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Street = table.Column<string>(type: "character varying(48)", maxLength: 48, nullable: false),
-                    ZipCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    ZipCode = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
                     City = table.Column<string>(type: "character varying(48)", maxLength: 48, nullable: false),
-                    Region = table.Column<string>(type: "character varying(48)", maxLength: 48, nullable: false),
+                    Region = table.Column<string>(type: "character varying(48)", maxLength: 48, nullable: true),
                     Country = table.Column<string>(type: "character varying(48)", maxLength: 48, nullable: false),
                     EmployeeId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
@@ -55,6 +55,18 @@ namespace Employees.Migrations
                 name: "IX_Addresses_EmployeeId",
                 table: "Addresses",
                 column: "EmployeeId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_Email",
+                table: "Employees",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_PhoneNumber",
+                table: "Employees",
+                column: "PhoneNumber",
                 unique: true);
         }
 

@@ -10,15 +10,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeesDbContext))]
-    [Migration("20211015151905_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20211019233738_DateTypeChange2")]
+    partial class DateTypeChange2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.10")
+                .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("Employees.Models.Address", b =>
@@ -41,7 +41,6 @@ namespace Employees.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Region")
-                        .IsRequired()
                         .HasMaxLength(48)
                         .HasColumnType("character varying(48)");
 
@@ -51,9 +50,8 @@ namespace Employees.Migrations
                         .HasColumnType("character varying(48)");
 
                     b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
 
                     b.HasKey("Id");
 
@@ -70,13 +68,13 @@ namespace Employees.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("DateOfDismission")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("DateOfHire")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -109,9 +107,16 @@ namespace Employees.Migrations
                         .HasColumnType("character varying(64)");
 
                     b.Property<double>("Salary")
+                        .HasPrecision(2)
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("Employees");
                 });

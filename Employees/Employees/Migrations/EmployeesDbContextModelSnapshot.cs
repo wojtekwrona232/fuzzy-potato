@@ -39,7 +39,6 @@ namespace Employees.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Region")
-                        .IsRequired()
                         .HasMaxLength(48)
                         .HasColumnType("character varying(48)");
 
@@ -49,9 +48,8 @@ namespace Employees.Migrations
                         .HasColumnType("character varying(48)");
 
                     b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
 
                     b.HasKey("Id");
 
@@ -111,6 +109,12 @@ namespace Employees.Migrations
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("Employees");
                 });
