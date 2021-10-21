@@ -42,6 +42,15 @@ namespace Employees
             services.AddDbContext<EmployeesDbContext>(optionsAction =>
                 optionsAction.UseNpgsql($"Host={server};Port={port};Database={database};Username={user};Password={password}"));
             services.AddHttpContextAccessor();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                  "CorsPolicy",
+                  builder => builder.WithOrigins("http://localhost:4200")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials());
+            });
             services.AddSingleton<IUriService>(o =>
             {
                 var accessor = o.GetRequiredService<IHttpContextAccessor>();
@@ -70,6 +79,8 @@ namespace Employees
             //uncoment this line to create the database and add 2k example records into the database
             //PrepDb.ExecuteMigration(app);
             #endregion
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
 
