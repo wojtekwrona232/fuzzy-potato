@@ -1,8 +1,8 @@
-﻿@page "/employees-data/{link?}"
-
-@using Frontend.Data
-@using Frontend.Models
+﻿@page "/"
+@using System.Net
+@inject NavigationManager _navigationManager
 @inject EmployeeService _employeeService
+
 
 
 @if (data == null)
@@ -13,9 +13,12 @@
 }
 else
 {
+    <div>
     <table class="table">
         <thead>
         <tr>
+            <th>Action</th>
+            <th>Select</th>
             <th>First name</th>
             <th>Last name</th>
             <th>Email</th>
@@ -27,6 +30,14 @@ else
         @foreach (var d in data.Data)
         {
             <tr>
+                <td>
+                    <div>
+                        <button class="btn-primary btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
+                        <button class="btn-warning btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
+                        <button class="btn btn-danger" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
+                    </div>
+                </td>
+                <td><input type="checkbox" id="@d.Email"/></td>
                 <td>@d.FirstName</td>
                 <td>@d.LastName</td>
                 <td>@d.Email</td>
@@ -36,26 +47,51 @@ else
         }
         </tbody>
         <nav aria-label="Page navigation example">
-          <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="">Next</a></li>
-          </ul>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" @onclick="(() => RenderPage(data.PreviousPage))">Previous</a></li>
+                <li class="page-item"><a class="page-link" @onclick="(() => RenderPage(data.FirstPage))">1</a></li>
+                <li class="page-item"><a class="page-link" @onclick="(() => RenderPage(data.PreviousPage))">@(data.PageNumber-1)</a></li>
+                <li class="page-item"><a class="page-link" href="#">@data.PageNumber</a></li>
+                <li class="page-item"><a class="page-link" @onclick="(() => RenderPage(data.NextPage))">@(data.PageNumber+1)</a></li>
+                <li class="page-item"><a class="page-link" @onclick="(() => RenderPage(data.LastPage))">@(data.TotalPages)</a></li>
+                <li class="page-item"><a class="page-link" @onclick="(() => RenderPage(data.NextPage))">Next</a></li>
+            </ul>
         </nav>
     </table>
+    </div>
 }
 
 @code {
     //private ICollection<EmployeeBasicDataDto> data;
     private BasicPaged data;
+    
 
     protected override async Task OnInitializedAsync()
     {
-        //data = _employeeService.GetBasicData();
-        data = _employeeService.GetBasicDataPaged(null);
-        
+        data = await _employeeService.GetBasicPaged();
     }
 
+    void ShowEmployee(Guid id)
+    {
+        _navigationManager.NavigateTo($"details/{id}");
+    }
+    
+    void EditEmployee(Guid id)
+    {
+        _navigationManager.NavigateTo($"edit-employee/{id}");
+    }
+    
+    async void DeleteEmployee(Guid id)
+    {
+        var resp = await _employeeService.DeleteEmployee(id);
+        if (resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NoContent)
+        {
+            _navigationManager.NavigateTo("/", true);
+        }
+    }
+    
+    async void RenderPage(Uri uri)
+    {
+        data = await _employeeService.GetBasicPaged(uri);
+    }
 }

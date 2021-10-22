@@ -1,0 +1,83 @@
+﻿@page "/details/{id:guid}"
+
+@inject EmployeeService _employeeService
+
+<h3>Deatils</h3>
+
+<tbody>
+<tr>
+    <th>First name</th>
+    <td>@_employee.FirstName</td>
+</tr>
+<tr>
+    <th>Last name</th>
+    <td>@_employee.LastName</td>
+</tr>
+<tr>
+    <th>Email</th>
+    <td>@_employee.Email</td>
+</tr>
+<tr>
+    <th>Phone number</th>
+    <td>@_employee.PhoneNumber</td>
+</tr>
+<tr>
+    <th>Gender</th>
+    <td>@_employee.Gender</td>
+</tr>
+<tr>
+    <th>Date of birth</th>
+    <td>@_employee.DateOfBirth.ToShortDateString()</td>
+</tr>
+<tr>
+    <th>Date of hire</th>
+    <td>@_employee.DateOfHire.ToShortDateString()</td>
+</tr>
+    @if (_employee.DateOfDismission != null)
+    {
+        <tr>
+            <th>Date of dissmission</th>
+            <td>@_employee.DateOfDismission.Value.Date.ToShortDateString()</td>
+        </tr>
+    }
+<tr>
+    <th>Salary</th>
+    <td>$ @_employee.Salary</td>
+</tr>
+<tr>
+    <th>Position</th>
+    <td>@_employee.Position</td>
+</tr>
+</tbody>
+<hr/>
+<h5>Address</h5>
+
+<div>
+    @_employee.Address.Street
+    <br/>
+    @_employee.Address.ZipCode @_employee.Address.City
+    <br/>
+    @if (string.IsNullOrWhiteSpace(_employee.Address.Region))
+    {
+        <p>@_employee.Address.Country</p>
+    }
+    else
+    {
+        <p>@_employee.Address.Region, @_employee.Address.Country</p>
+    }
+</div>
+
+
+@code {
+    
+    [Parameter]
+    public Guid Id { get; set; }
+    
+    private Employee _employee;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _employee = _employeeService.GetEmployeeInfo(Id);
+    }
+
+}

@@ -1,0 +1,50 @@
+﻿@page "/edit-employee/{id:guid}"
+
+@inject EmployeeService _employeeService
+@inject NavigationManager _navigationManager
+
+<h3>EmployeeEdit</h3>
+
+<div class="container">
+    <EditForm Model="@NameModel" OnValidSubmit="HandleNameSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <InputText id="firstName" @bind-Value="NameModel.FirstName" class="form-control"></InputText>
+        </div>
+        <div class="form-group">
+            <label for="lastname">Last Name</label>
+            <InputText id="lastname" @bind-Value="NameModel.LastName" class="form-control"></InputText>
+        </div>
+        <button type="submit" class="btn btn-primary">Change name</button>
+    </EditForm>
+</div>
+
+@code {
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    public NameModel NameModel { get; set; } = new();
+
+    private Employee _employee;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _employee = await _employeeService.GetEmployee(Id);
+        NameModel.FirstName = _employee.FirstName;
+        NameModel.LastName = _employee.LastName;
+    }
+
+    async void HandleNameSubmit()
+    {
+        var res = await _employeeService.EditName(Id, NameModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo("/");
+        }
+    }
+
+
+}

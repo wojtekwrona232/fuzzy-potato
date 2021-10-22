@@ -48,3 +48,12 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+    
+form {
+    display: inline !important;
+    margin-top: 0em;
+}
+
+.podkul {
+    
+}
