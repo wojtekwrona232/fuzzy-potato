@@ -1,0 +1,61 @@
+﻿@page "/employees-data/{link?}"
+
+@using Frontend.Data
+@using Frontend.Models
+@inject EmployeeService _employeeService
+
+
+@if (data == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Email</th>
+            <th>Phone number</th>
+            <th>Position</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var d in data.Data)
+        {
+            <tr>
+                <td>@d.FirstName</td>
+                <td>@d.LastName</td>
+                <td>@d.Email</td>
+                <td>@d.PhoneNumber</td>
+                <td>@d.Position</td>
+            </tr>
+        }
+        </tbody>
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="">Next</a></li>
+          </ul>
+        </nav>
+    </table>
+}
+
+@code {
+    //private ICollection<EmployeeBasicDataDto> data;
+    private BasicPaged data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //data = _employeeService.GetBasicData();
+        data = _employeeService.GetBasicDataPaged(null);
+        
+    }
+
+}
