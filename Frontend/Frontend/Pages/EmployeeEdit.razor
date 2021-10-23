@@ -21,12 +21,116 @@
     </EditForm>
 </div>
 
+<div class="container mt-2">
+    <EditForm Model="@PhoneNumberModel" OnValidSubmit="HandlePhoneSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="phone">Phone number</label>
+            <InputText id="phone" @bind-Value="PhoneNumberModel.PhoneNumber" class="form-control"></InputText>
+        </div>
+        <button type="submit" class="btn btn-primary">Change phone number</button>
+    </EditForm>
+</div>
+
+<div class="container mt-2">
+    <EditForm Model="@EmailModel" OnValidSubmit="HandleEmailSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <InputText id="email" @bind-Value="EmailModel.Email" class="form-control"></InputText>
+        </div>
+        <button type="submit" class="btn btn-primary">Change email address</button>
+    </EditForm>
+</div>
+
+<div class="container mt-2">
+    <EditForm Model="@DobModel" OnValidSubmit="HandleDobSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="dob">Date of birth</label>
+            <InputDate id="dob" @bind-Value="DobModel.DateOfBirth" class="form-control"></InputDate>
+        </div>
+        <button type="submit" class="btn btn-primary">Change date of birth</button>
+    </EditForm>
+</div>
+
+<div class="container mt-2">
+    <EditForm Model="@GenderModel" OnValidSubmit="HandleGenderSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="Gender">Gender</label>
+            <InputText id="Gender" @bind-Value="GenderModel.Gender" class="form-control"></InputText>
+        </div>
+        <button type="submit" class="btn btn-primary">Change gender</button>
+    </EditForm>
+</div>
+
+<div class="container mt-5">
+    <EditForm Model="@PositionModel" OnValidSubmit="HandlePositionSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="position">Position at the office</label>
+            <InputText id="position" @bind-Value="PositionModel.Position" class="form-control"></InputText>
+        </div>
+        <button type="submit" class="btn btn-primary">Change position</button>
+    </EditForm>
+</div>
+
+<div class="container mt-5">
+    <EditForm Model="@SalaryModel" OnValidSubmit="HandleEmailSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="salary">Salary</label>
+            <InputNumber id="salary" @bind-Value="SalaryModel.Salary" class="form-control"></InputNumber>
+        </div>
+        <button type="submit" class="btn btn-primary">Change salary</button>
+    </EditForm>
+</div>
+
+<div class="container mt-2">
+    <EditForm Model="@HireDateModel" OnValidSubmit="HandleHireSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="hire">Hiring data</label>
+            <InputDate id="hire" @bind-Value="HireDateModel.Date" class="form-control"></InputDate>
+        </div>
+        <button type="submit" class="btn btn-primary">Change hiring date</button>
+    </EditForm>
+</div>
+
+<div class="container mt-2">
+    <EditForm Model="@DismissDateModel" OnValidSubmit="HandleDismissSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            <label for="dismiss">Dismission data</label>
+            <InputDate id="dismiss" @bind-Value="DismissDateModel.Date" class="form-control"></InputDate>
+        </div>
+        <button type="submit" class="btn btn-primary">Change dismission date</button>
+    </EditForm>
+</div>
+
 @code {
 
     [Parameter]
     public Guid Id { get; set; }
 
-    public NameModel NameModel { get; set; } = new();
+    private NameModel NameModel { get; } = new();
+    private DobModel DobModel { get; } = new();
+    private HireDateModel HireDateModel { get; } = new();
+    private DismissionDateModel DismissDateModel { get; } = new();
+    private PhoneNumberModel PhoneNumberModel { get; } = new();
+    private EmailModel EmailModel { get; } = new();
+    private PositionModel PositionModel { get; } = new();
+    private SalaryModel SalaryModel { get; } = new();
+    private GenderModel GenderModel { get; } = new();
 
     private Employee _employee;
 
@@ -35,6 +139,7 @@
         _employee = await _employeeService.GetEmployee(Id);
         NameModel.FirstName = _employee.FirstName;
         NameModel.LastName = _employee.LastName;
+        DobModel.DateOfBirth = _employee.DateOfBirth;
     }
 
     async void HandleNameSubmit()
@@ -42,7 +147,70 @@
         var res = await _employeeService.EditName(Id, NameModel);
         if (res.IsSuccessStatusCode)
         {
-            _navigationManager.NavigateTo("/");
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+
+    async void HandleDobSubmit()
+    {
+        var res = await _employeeService.EditDob(Id, DobModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+    
+    async void HandleHireSubmit()
+    {
+        var res = await _employeeService.EditHireDate(Id, HireDateModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+
+    async void HandleDismissSubmit()
+    {
+        var res = await _employeeService.EditDismissDate(Id, DismissDateModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+
+    async void HandlePhoneSubmit()
+    {
+        var res = await _employeeService.EditPhoneNumber(Id, DismissDateModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+
+    async void HandleEmailSubmit()
+    {
+        var res = await _employeeService.EditEmail(Id, EmailModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+
+    async void HandlePositionSubmit()
+    {
+        var res = await _employeeService.EditPosition(Id, PositionModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
+        }
+    }
+
+    async void HandleGenderSubmit()
+    {
+        var res = await _employeeService.EditGender(Id, GenderModel);
+        if (res.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo($"edit-employee/{Id}", true);
         }
     }
 

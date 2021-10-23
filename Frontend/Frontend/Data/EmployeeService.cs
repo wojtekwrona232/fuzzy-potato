@@ -65,13 +65,76 @@ namespace Frontend.Data
             return resp;
         }
         
-        public async Task<HttpResponseMessage> EditName(Guid id, NameModel nameModel)
+        public async Task<HttpResponseMessage> EditName(Guid id, NameModel model)
         {
-            var firstName = nameModel.FirstName;
-            var lastName = nameModel.LastName;
+            var firstName = model.FirstName;
+            var lastName = model.LastName;
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
                 $"https://localhost:5001/api/EmployeeUpdate/name/{id}/{firstName}&{lastName}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditDob(Guid id, DobModel model)
+        {
+            var value = model.DateOfBirth;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/dob/{id}/{value}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditHireDate(Guid id, HireDateModel model)
+        {
+            var value = model.Date;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/date-hire/{id}/{value}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditDismissDate(Guid id, DismissionDateModel model)
+        {
+            var value = model.Date;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/date-dismission/{id}/{value}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditPhoneNumber(Guid id, DismissionDateModel model)
+        {
+            var value = model.Date;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/phone-number/{id}/{value}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditEmail(Guid id, EmailModel model)
+        {
+            var value = model.Email;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/email/{id}/{value}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditPosition(Guid id, PositionModel model)
+        {
+            var value = model.Position;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/position/{id}/{value}", null);
+            return resp;
+        }
+        
+        public async Task<HttpResponseMessage> EditGender(Guid id, GenderModel model)
+        {
+            var value = model.Gender;
+            var client = _clientFactory.CreateClient();
+            var resp = await client.PutAsync(
+                $"https://localhost:5001/api/EmployeeUpdate/gender/{id}/{value}", null);
             return resp;
         }
     }

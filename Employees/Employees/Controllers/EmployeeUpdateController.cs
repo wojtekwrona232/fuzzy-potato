@@ -235,7 +235,7 @@ namespace Employees.Controllers
             return user;
         }
         
-        [HttpPut("possition/{id}/{possition}")]
+        [HttpPut("position/{id}/{possition}")]
         public async Task<ActionResult<Employee>> ChangePossition(Guid id, [MinLength(1)] [MaxLength(64)] string possition)
         {
             var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
