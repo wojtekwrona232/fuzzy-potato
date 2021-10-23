@@ -8,7 +8,7 @@ namespace Frontend.Models
 {
     public class Employee
     {
-        [Required] public Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         public string FirstName { get; set; }
 

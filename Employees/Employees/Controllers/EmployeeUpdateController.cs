@@ -25,8 +25,8 @@ namespace Employees.Controllers
             _context = context;
         }
 
-        [HttpPut("address/{id}/{street}&{zipCode}&{city}&{region}&{country}")]
-        public async Task<ActionResult<Address>> ChangeLocation(Guid id, string street, string zipCode, string city, string region, string country)
+        [HttpPut("address/{id}")]
+        public async Task<ActionResult<Address>> ChangeLocation(Guid id, string street, string? zipCode, string city, string? region, string country)
         {
             var value = await _context.Addresses.SingleOrDefaultAsync(p => p.EmployeeId == id);
 
@@ -40,19 +40,9 @@ namespace Employees.Controllers
                 return UnprocessableEntity("Street is empty or consists only of white space");
             }
 
-            if (string.IsNullOrEmpty(zipCode) || string.IsNullOrWhiteSpace(zipCode))
-            {
-                return UnprocessableEntity("Zip code is empty or consists only of white space");
-            }
-            
             if (string.IsNullOrEmpty(city) || string.IsNullOrWhiteSpace(city))
             {
                 return UnprocessableEntity("City is empty or consists only of white space");
-            }
-
-            if (string.IsNullOrEmpty(region) || string.IsNullOrWhiteSpace(region))
-            {
-                return UnprocessableEntity("Region is empty or consists only of white space");
             }
 
             if (string.IsNullOrEmpty(country) || string.IsNullOrWhiteSpace(country))

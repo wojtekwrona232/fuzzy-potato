@@ -10,6 +10,6 @@ namespace Frontend.Models
         [DataType(DataType.Date)]
         [DateWithinMonth]
         [Display(Name = "Date of dismission")]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
     }
 }

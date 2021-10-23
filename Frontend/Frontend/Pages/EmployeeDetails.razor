@@ -1,5 +1,6 @@
 ﻿@page "/details/{id:guid}"
 
+@inject NavigationManager _navigationManager
 @inject EmployeeService _employeeService
 
 <h3>Deatils</h3>
@@ -67,6 +68,12 @@
     }
 </div>
 
+<div class="container">
+    <div class="btn-group" role="group" aria-label="switch">
+      <button type="button" class="btn btn-warning" @onclick="(() => EditEmployee(Id))">Edit data</button>
+      <button type="button" class="btn btn-danger" @onclick="(() => DeleteEmployee(Id))">Remove employee</button>
+    </div>
+</div>
 
 @code {
     
@@ -78,6 +85,20 @@
     protected override async Task OnInitializedAsync()
     {
         _employee = _employeeService.GetEmployeeInfo(Id);
+    }
+
+    void EditEmployee(Guid id)
+    {
+        _navigationManager.NavigateTo($"edit-employee/{id}");
+    }
+
+    async void DeleteEmployee(Guid id)
+    {
+        var resp = await _employeeService.DeleteEmployee(id);
+        if (resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NoContent)
+        {
+            _navigationManager.NavigateTo("/");
+        }
     }
 
 }

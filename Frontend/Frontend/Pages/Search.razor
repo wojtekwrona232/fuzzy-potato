@@ -1,0 +1,414 @@
+@page "/search"
+@page "/search/{model:bool}/{searchValue}/{orderBy:int}/{desc:bool}/{paged:bool}"
+@page "/search/{model:bool}/{orderBy:int}/{desc:bool}/{paged:bool}/{firstName?}/{lastName?}/{email?}/{phoneNumber?}/{position?}"
+
+@inject NavigationManager _navigationManager
+@inject EmployeeService _employeeService
+
+<div class="container">
+    <div class="h3">Search for employees</div>
+
+    <div class="row">
+        <div>
+            <label for="checkAdvanced">Select if you want advanced search</label>
+            <input id="checkAdvanced" type="checkbox" @onchange="eventArgs => { AdvancedSearchSelected(eventArgs.Value); }" />
+        </div>
+            @if (_advancedSearch == false)
+            {
+                <div class="col-6">
+                    <EditForm Model="SimpleSearchModel" OnValidSubmit="HandleSimpleSearchSubmit">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        <div class="form-group">
+                            <label for="searchText">Input text that you want to search for</label>
+                            <InputText id="searchText" @bind-Value="SimpleSearchModel.SearchValue" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="order">Order by column</label>
+                            <InputSelect id="order" @bind-Value="SimpleSearchModel.OrderBy" class="form-control">
+                                <option value="">Select option ...</option>
+                                <option value="1">First name</option>
+                                <option value="2">Last name</option>
+                                <option value="3">Email</option>
+                                <option value="4">Phone number</option>
+                                <option value="5">Position</option>
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label for="desc">Should the order be descending</label>
+                            <InputCheckbox id="desc" @bind-Value="SimpleSearchModel.OrderDesc" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="paged">Should the result be paged</label>
+                            <InputCheckbox id="paged" @bind-Value="SimpleSearchModel.Paged" class="form-control"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </EditForm>
+                </div>
+            }
+            else
+            {
+                <div class="col-6">
+                    <EditForm Model="AdvancedSearchModel" OnValidSubmit="HandleAdvancedSearchSubmit">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        <div class="form-group">
+                            <label for="searchText">Search by first name</label>
+                            <InputText id="searchText" @bind-Value="AdvancedSearchModel.SearchValueFirstName" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchText1">Search by last name</label>
+                            <InputText id="searchText1" @bind-Value="AdvancedSearchModel.SearchValueLastName" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchText2">Search by position</label>
+                            <InputText id="searchText2" @bind-Value="AdvancedSearchModel.SearchValuePosition" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchText3">Search by phone number</label>
+                            <InputText id="searchText3" @bind-Value="AdvancedSearchModel.SearchValuePhoneNumber" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchText4">Search by email</label>
+                            <InputText id="searchText4" @bind-Value="AdvancedSearchModel.SearchValueEmail" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="order">Order by column</label>
+                            <InputSelect id="order" @bind-Value="AdvancedSearchModel.OrderBy" class="form-control">
+                                <option value="">Select option ...</option>
+                                <option value="1">First name</option>
+                                <option value="2">Last name</option>
+                                <option value="3">Email</option>
+                                <option value="4">Phone number</option>
+                                <option value="5">Position</option>
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label for="desc">Should the order be descending</label>
+                            <InputCheckbox id="desc" @bind-Value="AdvancedSearchModel.OrderDesc" class="form-control"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="paged">Should the result be paged</label>
+                            <InputCheckbox id="paged" @bind-Value="AdvancedSearchModel.Paged" class="form-control"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </EditForm>
+                </div>
+            }
+    </div>
+
+    @if (_data != null)
+    {
+        <div class="row">
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Select</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Email</th>
+                        <th>Phone number</th>
+                        <th>Position</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var d in _data.Data)
+                    {
+                        <tr>
+                            <td>
+                                <div>
+                                    <button class="btn-primary btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
+                                    <button class="btn-warning btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
+                                    <button class="btn btn-danger" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="@d.Email"/>
+                            </td>
+                            <td>@d.FirstName</td>
+                            <td>@d.LastName</td>
+                            <td>@d.Email</td>
+                            <td>@d.PhoneNumber</td>
+                            <td>@d.Position</td>
+                        </tr>
+                    }
+                    </tbody>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">Previous</button>
+                            </li>
+                            @if (_data.PageNumber > 1)
+                            {
+                                <li class="page-item">
+                                    <button class="btn page-link" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
+                                </li>
+                            }
+                            @if (_data.PageNumber > 2)
+                            {
+                                <li class="page-item">
+                                    <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
+                                </li>
+                            }
+                            <li class="page-item">
+                                <button class="btn page-link">@_data.PageNumber</button>
+                            </li>
+                            @if (_data.NextPage != null && _data.PageNumber < _data.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
+                                </li>
+                            }
+                            <li class="page-item">
+                                <button class="btn page-link" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
+                            </li>
+                            <li class="page-item">
+                                <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">Next</button>
+                            </li>
+                        </ul>
+                    </nav>
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (_dataCollection != null)
+    {
+        <div class="row">
+            <div class="col-12">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Select</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Email</th>
+                        <th>Phone number</th>
+                        <th>Position</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var d in _dataCollection)
+                    {
+                        <tr>
+                            <td>
+                                <div>
+                                    <button class="btn-primary btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
+                                    <button class="btn-warning btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
+                                    <button class="btn btn-danger" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="@d.Email"/>
+                            </td>
+                            <td>@d.FirstName</td>
+                            <td>@d.LastName</td>
+                            <td>@d.Email</td>
+                            <td>@d.PhoneNumber</td>
+                            <td>@d.Position</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>
+
+@functions {
+
+    void AdvancedSearchSelected(object checkValue)
+    {
+        if ((bool) checkValue)
+        {
+            _advancedSearch = true;
+            Model = true;
+        }
+        else
+        {
+            _advancedSearch = false;
+            Model = false;
+        }
+    }
+}
+
+@code {
+    //{model:bool}/{searchValue}&{orderBy}&{desc}&{paged}
+    //{model:bool}/{orderBy}&{desc}&{paged}/{fN}/{LastName}/{Email}/{PhoneNumber}/{Position}
+    [Parameter]
+    public bool Model { get; set; }
+    [Parameter]
+    public string SearchValue { get; set; }
+    [Parameter]
+    public string? FirstName { get; set; }
+    [Parameter]
+    public string? LastName { get; set; }
+    [Parameter]
+    public string? Email { get; set; }
+    [Parameter]
+    public string? PhoneNumber { get; set; }
+    [Parameter]
+    public string? Position { get; set; }
+    [Parameter]
+    public int OrderBy { get; set; }
+    [Parameter]
+    public bool Desc { get; set; }
+    [Parameter]
+    public bool Paged { get; set; }
+
+    private bool _wasPaged;
+    private ICollection<EmployeeBasicDataDto> _dataCollection;
+    private BasicPaged _data;
+    private bool _advancedSearch;
+    private SimpleSearchModel SimpleSearchModel { get; } = new();
+    private AdvancedSearchModel AdvancedSearchModel { get; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dataCollection = null;
+
+        if (Model)
+        {
+            _advancedSearch = true;
+            AdvancedSearchModel.SearchValueFirstName = FirstName;
+            AdvancedSearchModel.SearchValueLastName = LastName;
+            AdvancedSearchModel.SearchValueEmail = Email;
+            AdvancedSearchModel.SearchValuePhoneNumber = PhoneNumber;
+            AdvancedSearchModel.SearchValuePosition = Position;
+            AdvancedSearchModel.OrderBy = OrderBy;
+            AdvancedSearchModel.OrderDesc = Desc;
+            AdvancedSearchModel.Paged = Paged;
+            if (!string.IsNullOrWhiteSpace(FirstName) || !string.IsNullOrWhiteSpace(LastName) || !string.IsNullOrWhiteSpace(Email) ||
+                !string.IsNullOrWhiteSpace(PhoneNumber) || !string.IsNullOrWhiteSpace(Position))
+            {
+                if (Paged)
+                {
+                    _data = await _employeeService.GetAdvancedSearchPaged(AdvancedSearchModel);
+                }
+                else
+                {
+                    _dataCollection = await _employeeService.GetAdvancedSearch(AdvancedSearchModel);
+                }
+            }
+            else
+            {
+                _data = null;
+                _dataCollection = null;
+            }
+        }
+        else
+        {
+            _advancedSearch = false;
+            SimpleSearchModel.SearchValue = SearchValue;
+            SimpleSearchModel.OrderBy = OrderBy;
+            SimpleSearchModel.OrderDesc = Desc;
+            SimpleSearchModel.Paged = Paged;
+            
+            if (!string.IsNullOrWhiteSpace(SearchValue))
+            {
+                if (Paged)
+                {
+                    _data = await _employeeService.GetBasicSearchPaged(SimpleSearchModel);
+                }
+                else
+                {
+                    _dataCollection = await _employeeService.GetBasicSearch(SimpleSearchModel);
+                }
+            }
+            else
+            {
+                _data = null;
+                _dataCollection = null;
+            }
+        }
+    }
+
+    void ShowEmployee(Guid id)
+    {
+        _navigationManager.NavigateTo($"details/{id}");
+    }
+
+    void EditEmployee(Guid id)
+    {
+        _navigationManager.NavigateTo($"edit-employee/{id}");
+    }
+
+    async void DeleteEmployee(Guid id)
+    {
+        if (Model)
+        {
+            var resp = await _employeeService.DeleteEmployee(id);
+            if (resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NoContent)
+            {
+                _navigationManager.NavigateTo($"/search/{true}/{AdvancedSearchModel.OrderBy}/{AdvancedSearchModel.OrderDesc}/{AdvancedSearchModel.Paged}/{AdvancedSearchModel.SearchValueFirstName}/{AdvancedSearchModel.SearchValueLastName}/{AdvancedSearchModel.SearchValueEmail}/{AdvancedSearchModel.SearchValuePhoneNumber}/{AdvancedSearchModel.SearchValuePosition}", true);
+            }
+        }
+        else
+        {
+            var resp = await _employeeService.DeleteEmployee(id);
+            if (resp.IsSuccessStatusCode || resp.StatusCode == HttpStatusCode.NoContent)
+            {
+                _navigationManager.NavigateTo($"/search/{false}/{SimpleSearchModel.SearchValue}/{SimpleSearchModel.OrderBy}/{SimpleSearchModel.OrderDesc}/{SimpleSearchModel.Paged}", true);
+            }
+        }
+    }
+
+    async void RenderPage(Uri uri)
+    {
+        _data = await _employeeService.GetBasicPaged(uri);
+        StateHasChanged();
+    }
+
+    async void HandleSimpleSearchSubmit()
+    {
+        switch (_wasPaged)
+        {
+            case true when !SimpleSearchModel.Paged:
+                _data = null;
+                break;
+            case false when SimpleSearchModel.Paged:
+                _dataCollection = null;
+                break;
+        }
+        if (SimpleSearchModel.Paged)
+        {
+            _data = await _employeeService.GetBasicSearchPaged(SimpleSearchModel);
+            _wasPaged = true;
+        }
+        else
+        {
+            _dataCollection = await _employeeService.GetBasicSearch(SimpleSearchModel);
+            _wasPaged = false;
+        }
+        StateHasChanged();
+    }
+    
+    async void HandleAdvancedSearchSubmit()
+    {
+        switch (_wasPaged)
+        {
+            case true when !AdvancedSearchModel.Paged:
+                _data = null;
+                break;
+            case false when AdvancedSearchModel.Paged:
+                _dataCollection = null;
+                break;
+        }
+        if (AdvancedSearchModel.Paged)
+        {
+            _data = await _employeeService.GetAdvancedSearchPaged(AdvancedSearchModel);
+            _wasPaged = true;
+        }
+        else
+        {
+            _dataCollection = await _employeeService.GetAdvancedSearch(AdvancedSearchModel);
+            _wasPaged = false;
+        }
+        StateHasChanged();
+    }
+
+}

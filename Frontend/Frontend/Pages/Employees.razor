@@ -1,5 +1,5 @@
 ﻿@page "/"
-@using System.Net
+
 @inject NavigationManager _navigationManager
 @inject EmployeeService _employeeService
 
@@ -116,6 +116,7 @@ else
     async void RenderPage(Uri uri)
     {
         _data = await _employeeService.GetBasicPaged(uri);
+        StateHasChanged();
     }
 
 }
