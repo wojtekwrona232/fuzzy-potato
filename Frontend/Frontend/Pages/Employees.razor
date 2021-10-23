@@ -5,6 +5,7 @@
 
 
 
+<button class="btn page-link" @onclick="() => PrintData()">Press to send email</button>
 @if (_data == null)
 {
     <p>
@@ -38,7 +39,7 @@ else
                         </div>
                     </td>
                     <td>
-                        <input type="checkbox" id="@d.Email"/>
+                        <input type="checkbox" value="@IsEmployeeSelected(d)" @onchange="args => { AddSelectedEmployee(d, args.Value); }"/>
                     </td>
                     <td>@d.FirstName</td>
                     <td>@d.LastName</td>
@@ -86,6 +87,33 @@ else
     </div>
 }
 
+@functions {
+    private ICollection<EmployeeBasicDataDto> EmployeeList { get; set; } = new List<EmployeeBasicDataDto>();
+
+    bool IsEmployeeSelected(EmployeeBasicDataDto d)
+    {
+        return EmployeeList.Contains(d);
+    }
+
+    void AddSelectedEmployee(EmployeeBasicDataDto dto, object checkValue)
+    {
+        if ((bool) checkValue)
+        {
+            if (!EmployeeList.Contains(dto))
+            {
+                EmployeeList.Add(dto);
+            }
+        }
+        else
+        {
+            if (EmployeeList.Contains(dto))
+            {
+                EmployeeList.Remove(dto);
+            }
+        }
+    }
+}
+
 @code {
     private BasicPaged _data;
 
@@ -116,7 +144,18 @@ else
     async void RenderPage(Uri uri)
     {
         _data = await _employeeService.GetBasicPaged(uri);
+        
+        
+        
         StateHasChanged();
+    }
+
+    void PrintData()
+    {
+        foreach (var emp in EmployeeList)
+        {
+            Console.WriteLine(emp.Id);
+        }
     }
 
 }
