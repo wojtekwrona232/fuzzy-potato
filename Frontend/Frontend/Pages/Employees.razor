@@ -3,9 +3,42 @@
 @inject NavigationManager _navigationManager
 @inject EmployeeService _employeeService
 
+<style>
+.chip {
+    display: inline;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    margin-right: 1rem;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(0,0,0,.6);
+    cursor: pointer;
+    background-color: #eceff1;
+    border-radius: 16px;
+    -webkit-transition: opacity .3s linear;
+    transition: opacity .3s linear;
+    word-wrap: break-word;
+    text-transform: none;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+</style>
 
+@if (_emails.Count > 0)
+{
+    <button class="btn page-link" @onclick="() => PrintData()">Press to send email</button>
+    @foreach (var value in _emails)
+    {
+        <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => AddSelectedEmployee(value)">@value <b> X</b></button>
+    }
+}
 
-<button class="btn page-link" @onclick="() => PrintData()">Press to send email</button>
 @if (_data == null)
 {
     <p>
@@ -14,8 +47,8 @@
 }
 else
 {
-    <div>
-        <table class="table">
+    <div class="table-wrapper-scroll-y">
+        <table class="table table-bordered table-striped">
             <thead>
             <tr>
                 <th>Action</th>
@@ -39,7 +72,14 @@ else
                         </div>
                     </td>
                     <td>
-                        <input type="checkbox" value="@IsEmployeeSelected(d)" @onchange="args => { AddSelectedEmployee(d, args.Value); }"/>
+                        @if (_emails.Contains(d.Email))
+                        {
+                            <button class="btn page-link" @onclick="(() => AddSelectedEmployee(d.Email))">Remove from email list</button>
+                        }
+                        else
+                        {
+                            <button class="btn page-link" @onclick="(() => AddSelectedEmployee(d.Email))">Add to email list</button>
+                        }
                     </td>
                     <td>@d.FirstName</td>
                     <td>@d.LastName</td>
@@ -49,79 +89,65 @@ else
                 </tr>
             }
             </tbody>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item">
-                        <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">Previous</button>
-                    </li>
-                    @if (_data.PageNumber > 1)
-                    {
-                        <li class="page-item">
-                            <button class="btn page-link" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
-                        </li>
-                    }
-                    @if (_data.PageNumber > 2)
-                    {
-                        <li class="page-item">
-                            <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
-                        </li>
-                    }
-                    <li class="page-item">
-                        <button class="btn page-link">@_data.PageNumber</button>
-                    </li>
-                    @if (_data.NextPage != null && _data.PageNumber < _data.TotalPages)
-                    {
-                        <li class="page-item">
-                            <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
-                        </li>
-                    }
-                    <li class="page-item">
-                        <button class="btn page-link" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
-                    </li>
-                    <li class="page-item">
-                        <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">Next</button>
-                    </li>
-                </ul>
-            </nav>
         </table>
     </div>
-}
-
-@functions {
-    private ICollection<EmployeeBasicDataDto> EmployeeList { get; set; } = new List<EmployeeBasicDataDto>();
-
-    bool IsEmployeeSelected(EmployeeBasicDataDto d)
-    {
-        return EmployeeList.Contains(d);
-    }
-
-    void AddSelectedEmployee(EmployeeBasicDataDto dto, object checkValue)
-    {
-        if ((bool) checkValue)
-        {
-            if (!EmployeeList.Contains(dto))
+    
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">Previous</button>
+            </li>
+            @if (_data.PageNumber > 1)
             {
-                EmployeeList.Add(dto);
+                <li class="page-item">
+                    <button class="btn page-link" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
+                </li>
             }
-        }
-        else
-        {
-            if (EmployeeList.Contains(dto))
+            @if (_data.PageNumber > 2)
             {
-                EmployeeList.Remove(dto);
+                <li class="page-item">
+                    <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
+                </li>
             }
-        }
-    }
+            <li class="page-item">
+                <button class="btn page-link">@_data.PageNumber</button>
+            </li>
+            @if (_data.NextPage != null && _data.PageNumber < _data.TotalPages)
+            {
+                <li class="page-item">
+                    <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
+                </li>
+            }
+            <li class="page-item">
+                <button class="btn page-link" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
+            </li>
+            <li class="page-item">
+                <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">Next</button>
+            </li>
+        </ul>
+    </nav>
 }
 
 @code {
     private BasicPaged _data;
+    private readonly List<string> _emails = new();
 
     protected override async Task OnInitializedAsync()
     {
         _data = await _employeeService.GetBasicPaged();
     }
 
+    void AddSelectedEmployee(string dto)
+    {
+        if (!_emails.Contains(dto))
+        {
+            _emails.Add(dto);
+        }
+        else
+        {
+            _emails.Remove(dto);
+        }
+    }
     void ShowEmployee(Guid id)
     {
         _navigationManager.NavigateTo($"details/{id}");
@@ -144,18 +170,14 @@ else
     async void RenderPage(Uri uri)
     {
         _data = await _employeeService.GetBasicPaged(uri);
-        
-        
-        
         StateHasChanged();
     }
 
     void PrintData()
     {
-        foreach (var emp in EmployeeList)
-        {
-            Console.WriteLine(emp.Id);
-        }
+        var value = _emails.Aggregate("", (current, email) => current + email + ";-;");
+        value = value.Remove(value.Length-3);
+        _navigationManager.NavigateTo($"/send-email/{value}");
     }
 
 }

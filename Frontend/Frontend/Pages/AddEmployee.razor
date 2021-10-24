@@ -42,6 +42,10 @@
                                 <option value="@gender">@gender</option>
                             }
                         </InputSelect>
+                        @if (NewEmployeeModel.Gender != "Other")
+                        {
+                            NewEmployeeModel.GenderInput = NewEmployeeModel.Gender;
+                        }
                         @if (NewEmployeeModel.Gender == "Other")
                         {
                             <label for="GenderText">Gender</label>

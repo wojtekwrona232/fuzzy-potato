@@ -29,6 +29,7 @@ namespace Frontend
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<EmployeeService>();
+            services.AddScoped<SendEmailService>();
             services.AddHttpClient();
         }
 

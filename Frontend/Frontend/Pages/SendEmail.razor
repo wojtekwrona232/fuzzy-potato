@@ -1,0 +1,297 @@
+@page "/send-email"
+@page "/send-email/{emails?}"
+@inject SendEmailService _sendEmailService
+@inject NavigationManager _navigationManager
+
+<style>
+.chip {
+    display: inline;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    margin-right: 1rem;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(0,0,0,.6);
+    cursor: pointer;
+    background-color: #eceff1;
+    border-radius: 16px;
+    -webkit-transition: opacity .3s linear;
+    transition: opacity .3s linear;
+    word-wrap: break-word;
+    text-transform: none;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+</style>
+
+@if (EmailModelCollection == null)
+{
+    <p>Loading data...</p>
+}
+else
+{
+    
+<div class="container">
+    <div class="h3">Send an email</div>
+        <div class="row">
+            <div class="col-12">
+                <div>
+                    <div>
+                        @if (Recipients.Count > 0)
+                        {
+                            @foreach (var value in Recipients)
+                            {
+                                <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => RemoveRecipientFromList(value)">@value<b> X</b></button>
+                            }
+                        }
+                    </div>
+                    <label for="to">To</label>
+                    <select id="to" class="form-control" @onchange="args => AddRecipientToList((string) args.Value)">
+                        @foreach (var gender in EmailModelCollection)
+                        {
+                            <option value="@gender.Email">@gender.FirstName @gender.LastName - @gender.Email</option>
+                        }
+                    </select>
+                    <EditForm Model="ToEmailModel" OnValidSubmit="HandleToEmailSubmit">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        <div class="form-group">
+                            <InputText @bind-Value="ToEmailModel.Email" class="form-control"></InputText>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add recipiant</button>
+                    </EditForm>
+                </div>
+                <div>
+                    <div>
+                        @if (Ccs.Count > 0)
+                        {
+                            @foreach (var value in Ccs)
+                            {
+                                <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => RemoveFromCcList(value)">@value<b> X</b></button>
+                            }
+                        }
+                    </div>
+                    <label for="ccs">Cc</label>
+                    <select id="ccs" class="form-control" @onchange="args => AddToCcList((string) args.Value)">
+                        @foreach (var gender in EmailModelCollection)
+                        {
+                            <option value="@gender.Email">@gender.FirstName @gender.LastName - @gender.Email</option>
+                        }
+                    </select>
+                    <EditForm Model="CcEmailModel" OnValidSubmit="HandleCcEmailSubmit">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        <div class="form-group">
+                            <InputText @bind-Value="CcEmailModel.Email" class="form-control"></InputText>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add CC</button>
+                    </EditForm>
+                </div>
+                <div>
+                    <div>
+                        @if (Bccs.Count > 0)
+                        {
+                            @foreach (var value in Bccs)
+                            {
+                                <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => RemoveFromBccList(value)">@value <b> X</b></button>
+                            }
+                        }
+                    </div>
+                    <label for="bcc">Bcc</label>
+                    <select id="bcc" class="form-control" @onchange="args => AddToBccList((string) args.Value)">
+                        @foreach (var gender in EmailModelCollection)
+                        {
+                            <option value="@gender.Email">@gender.FirstName @gender.LastName - @gender.Email</option>
+                        }
+                    </select>
+                    <EditForm Model="BccEmailModel" OnValidSubmit="HandleBccEmailSubmit">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        <div class="form-group">
+                            <InputText @bind-Value="BccEmailModel.Email" class="form-control"></InputText>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add BCC</button>
+                    </EditForm>
+                </div>
+                <EditForm Model="EmailBodyModel" OnValidSubmit="HandleOnValidSubmit">
+                    <div class="form-group">
+                        <label for="Subject">Subject</label>
+                        <InputText id="Subject" @bind-Value="EmailBodyModel.Subject" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Message">Message</label>
+                        <InputTextArea id="Message" @bind-Value="EmailBodyModel.Body" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Signature">Signature</label>
+                        <InputTextArea id="Signature" @bind-Value="EmailBodyModel.Signature" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <p>Maximum total file size is 20MB</p>
+                        @if (_totalFileSize >= 2e+7)
+                        {
+                            <p style="color: darkred">Selected files are larger than 20MB!</p>
+                        }
+                        <InputFile OnChange="@LoadFiles" multiple/>
+                        <br/>
+                        @if (_files.Count > 0)
+                        {
+                            @foreach (var value in _files)
+                            {
+                                <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => RemoveFileFromList(value)">@value.Name - (@(value.Size/1024)KB)</button>
+                            }
+                        }
+                    </div>
+                    <div class="mt-2">
+                        <button type="submit" class="btn btn-primary">Send email</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+</div>
+}
+
+@code {
+
+    [Parameter]
+    public string? Emails { get; set; }
+    private long _totalFileSize;
+    private readonly List<IBrowserFile> _files = new();
+    private ICollection<EmployeeEmailModel> EmailModelCollection { get; set; }
+    private SendEmailModel SendEmailModel { get; } = new();
+    private EmailBodyModel EmailBodyModel { get; } = new();
+    private EmailModel ToEmailModel { get; } = new();
+    private EmailModel CcEmailModel { get; } = new();
+    private EmailModel BccEmailModel { get; } = new();
+    private bool _loading;
+    
+    private ICollection<string> Recipients { get; set; } = new List<string>();
+    private ICollection<string> Ccs { get; } = new List<string>();
+    private ICollection<string> Bccs { get; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        EmailModelCollection = await _sendEmailService.GetBasic();
+        _totalFileSize = 0;
+        
+        if (Emails != null)
+        {
+            var emails = Emails.Split(";-;").ToList();
+            Recipients = emails;
+        }
+    }
+
+    void LoadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            _loading = true;
+            if (!_files.Contains(file))
+            {
+                _files.Add(file);
+                _totalFileSize += file.Size;
+            }
+        }
+    }
+    
+    void RemoveFileFromList(IBrowserFile e)
+    {
+        if (_files.Contains(e))
+        {
+            _files.Remove(e);
+            _totalFileSize -= e.Size;
+        }
+    }
+    
+    async void HandleOnValidSubmit()
+    {
+        SendEmailModel.Recipients = Recipients;
+        SendEmailModel.Ccs = Ccs;
+        SendEmailModel.Bccs = Bccs;
+        SendEmailModel.Subject = EmailBodyModel.Subject;
+        SendEmailModel.Body = EmailBodyModel.Body;
+        SendEmailModel.Signature = EmailBodyModel.Signature;
+
+        Console.WriteLine(SendEmailModel.Recipients.ToString());
+        Console.WriteLine(SendEmailModel.Ccs.ToString());
+        Console.WriteLine(SendEmailModel.Bccs.ToString());
+        var resp = await _sendEmailService.SendEmail(SendEmailModel, _files);
+        if (resp.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo("/");
+        }
+    }
+
+    void AddRecipientToList(string value)
+    {
+        if (!Bccs.Contains(value) && !Ccs.Contains(value) && !Recipients.Contains(value))
+        {
+            Recipients.Add(value);
+        }
+    }
+    void RemoveRecipientFromList(string value)
+    {
+        if (Recipients.Contains(value))
+        {
+            Recipients.Remove(value);
+        }
+    }
+    void HandleToEmailSubmit()
+    {
+        if (!Bccs.Contains(ToEmailModel.Email) && !Ccs.Contains(ToEmailModel.Email) && !Recipients.Contains(ToEmailModel.Email))
+        {
+            Recipients.Add(ToEmailModel.Email);
+        }
+    }
+    
+    void AddToCcList(string value)
+    {
+        if (!Bccs.Contains(value) && !Ccs.Contains(value) && !Recipients.Contains(value))
+        {
+            Ccs.Add(value);
+        }
+    }
+    void HandleCcEmailSubmit()
+    {
+        if (!Bccs.Contains(CcEmailModel.Email) && !Ccs.Contains(CcEmailModel.Email) && !Recipients.Contains(CcEmailModel.Email))
+        {
+            Ccs.Add(CcEmailModel.Email);
+        }
+    }
+    void RemoveFromCcList(string value)
+    {
+        if (Ccs.Contains(value))
+        {
+            Ccs.Remove(value);
+        }
+    }
+    
+    void AddToBccList(string value)
+    {
+        if (!Bccs.Contains(value) && !Ccs.Contains(value) && !Recipients.Contains(value))
+        {
+            Bccs.Add(value);
+        }
+    }
+    void HandleBccEmailSubmit()
+    {
+        if (!Bccs.Contains(BccEmailModel.Email) && !Ccs.Contains(BccEmailModel.Email) && !Recipients.Contains(BccEmailModel.Email))
+        {
+            Bccs.Add(BccEmailModel.Email);
+        }
+    }
+    void RemoveFromBccList(string value)
+    {
+        if (Bccs.Contains(value))
+        {
+            Bccs.Remove(value);
+        }
+    }
+
+}

@@ -8,4 +8,10 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\js\mdb.min.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\mdb.min.js.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\mdb-favicon.ico" />
+    </ItemGroup>
+
 </Project>
