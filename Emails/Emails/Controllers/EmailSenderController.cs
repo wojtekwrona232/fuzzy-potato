@@ -27,6 +27,10 @@ namespace Emails.Controllers
                 throw new ArgumentNullException(nameof(dto));
             }
 
+            Console.WriteLine(dto.Body);
+            Console.WriteLine(dto.Signature);
+            Console.WriteLine(dto.Subject);
+
             var mailAddress = "apitestinguser69@gmail.com";
             var mailPassword = "5LT98wssY4675x7SV9mRAxt75EY6shUA67K9MNoxcD";
 
@@ -34,18 +38,21 @@ namespace Emails.Controllers
             foreach (var rcpt in dto.Recipients)
             {
                 recipients.Add(MailboxAddress.Parse(rcpt));
+                Console.WriteLine(rcpt);
             }
 
             var ccs = new InternetAddressList();
             foreach (var rcpt in dto.Ccs)
             {
                 ccs.Add(MailboxAddress.Parse(rcpt));
+                Console.WriteLine(rcpt);
             }
 
             var bccs = new InternetAddressList();
             foreach (var rcpt in dto.Bccs)
             {
                 bccs.Add(MailboxAddress.Parse(rcpt));
+                Console.WriteLine(rcpt);
             }
 
             long sizeOfFiles = 0;
@@ -79,7 +86,7 @@ namespace Emails.Controllers
                 memoryStream.Position = 0;
             }
 
-            bodyBuilder.HtmlBody = dto.Body + "\n" + dto.Signature;
+            bodyBuilder.HtmlBody = "<p>" + dto.Body + "</p><br/><p>" + dto.Signature + "</p>";
             multipart.Body = bodyBuilder.ToMessageBody();
 
             var email = new MimeMessage();

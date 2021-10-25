@@ -2,6 +2,7 @@
 @page "/send-email/{emails?}"
 @inject SendEmailService _sendEmailService
 @inject NavigationManager _navigationManager
+@inject IJSRuntime JsRuntime
 
 <style>
 .chip {
@@ -221,10 +222,19 @@ else
         Console.WriteLine(SendEmailModel.Recipients.ToString());
         Console.WriteLine(SendEmailModel.Ccs.ToString());
         Console.WriteLine(SendEmailModel.Bccs.ToString());
-        var resp = await _sendEmailService.SendEmail(SendEmailModel, _files);
-        if (resp.IsSuccessStatusCode)
+        var resp = await SendEmailService.SendEmail(SendEmailModel, _files);
+        switch (resp.StatusCode)
         {
-            _navigationManager.NavigateTo("/");
+            case 200:
+                await JsRuntime.InvokeVoidAsync("alert", "Email has been sent");
+                _navigationManager.NavigateTo("/");
+                break;
+            case 413:
+                await JsRuntime.InvokeVoidAsync("alert", "Files size is too big. Maximum is 20MB");
+                break;
+            default:
+                await JsRuntime.InvokeVoidAsync("alert", "An error was encountered. The emails couldn't be sent.");
+                break;
         }
     }
 
