@@ -4,9 +4,126 @@
 
 @inject NavigationManager _navigationManager
 @inject EmployeeService _employeeService
-
 <style>
-@@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+.chip {
+    display: inline;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    margin-right: 1rem;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ff94b5;
+    cursor: pointer;
+    background-color: #000000;
+    border: 3px solid #ff7da4!important;
+    border-radius: 16px;
+    -webkit-transition: opacity .3s linear;
+    transition: opacity .3s linear;
+    word-wrap: break-word;
+    text-transform: none;
+    margin-top: 2px;
+    margin-bottom: 5px;
+        font-family: 'Montserrat', sans-serif;
+}
+.chip:hover {
+    color: #ffb9cd!important;
+        border: 3px solid #ffb9cd!important;
+}
+.table-striped tbody tr:nth-of-type(odd){
+background-color: #f8a4bd!important;
+color: #020202!important;
+    font-family: 'Montserrat', sans-serif;
+        font-size: 16px!important;
+}
+.table-striped tbody tr:nth-of-type(even){
+background-color: #212121!important;
+color: #f8a4bd!important;
+    font-family: 'Montserrat', sans-serif;
+        font-size: 16px!important;
+}
+thead{
+background-color: #000000!important;
+color: #f8a4bd!important;
+}
+th{
+border-top: 1px solid #000000!important;
+}
+.table thead th{
+border-bottom: 2px solid #000000!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+}
+.table td{
+border-top: 1px solid #f8a4bd!important;
+}
+.btnrem {
+background-color: #f5bbcc!important;
+border: 3px solid #000000!important;
+-webkit-box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1);
+color: #020202!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+}
+.btnadd{
+background-color: #000000!important;
+border: 3px solid #f5bbcc!important;
+color: #f8a4bd!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+
+.btn1{
+background-color: #101010!important;
+border: 3px solid #daa4ff!important;
+color: #daa4ff!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+
+
+.btn2{
+background-color: #101010!important;
+border: 3px solid #ff945c!important;
+color: #ff945c!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+.btn3{
+background-color: #101010!important;
+border: 3px solid #ff5472!important;
+color: #ff5472!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+
+
     .h3{
      color: #fc90b0!important;
         font-family: 'Montserrat', sans-serif;
@@ -47,7 +164,7 @@ select option:hover{
 }
 
                   
-button{
+.searchbtn{
 margin-bottom: 10px;
 background-color: #f5bbcc!important;
 border: 4px solid #0a0a0a!important;
@@ -110,7 +227,7 @@ background-color: blue!important;
                             <label for="paged">Should the result be paged</label>
                             <InputCheckbox id="paged" @bind-Value="SimpleSearchModel.Paged" class="form-control spc"/>
                         </div>
-                        <button type="submit" class="btn btn-primary">Search</button>
+                        <button type="submit" class="btn searchbtn">Search</button>
                     </EditForm>
                 </div>
             }
@@ -159,7 +276,7 @@ background-color: blue!important;
                             <label for="paged">Should the result be paged</label>
                             <InputCheckbox id="paged" @bind-Value="AdvancedSearchModel.Paged" />
                         </div>
-                        <button type="submit" class="btn btn-primary">Search</button>
+                        <button type="submit" class="btn searchbtn">Search</button>
                     </EditForm>
                 </div>
             }
@@ -169,7 +286,7 @@ background-color: blue!important;
     {
         <div class="row">
             <div class="col-12">
-                <table class="table">
+                <table class="table table-striped">
                     <thead>
                     <tr>
                         <th>Action</th>
@@ -187,9 +304,9 @@ background-color: blue!important;
                         <tr>
                             <td>
                                 <div>
-                                    <button class="btn-primary btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
-                                    <button class="btn-warning btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
-                                    <button class="btn btn-danger" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
+                                    <button class="btn1 btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
+                                    <button class="btn2 btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
+                                    <button class="btn btn3" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
                                 </div>
                             </td>
                             <td>
@@ -246,7 +363,7 @@ background-color: blue!important;
     {
         <div class="row">
             <div class="col-12">
-                <table class="table">
+                <table class="table table-striped">
                     <thead>
                     <tr>
                         <th>Action</th>
@@ -264,9 +381,9 @@ background-color: blue!important;
                         <tr>
                             <td>
                                 <div>
-                                    <button class="btn-primary btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
-                                    <button class="btn-warning btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
-                                    <button class="btn btn-danger" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
+                                    <button class="btn1 btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
+                                    <button class="btn2 btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
+                                    <button class="btn btn3" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
                                 </div>
                             </td>
                             <td>
