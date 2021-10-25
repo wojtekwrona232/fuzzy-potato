@@ -4,6 +4,7 @@
 @inject EmployeeService _employeeService
 
 <style>
+    @@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 .chip {
     display: inline;
     -webkit-box-pack: justify;
@@ -17,22 +18,144 @@
     margin-right: 1rem;
     font-size: 13px;
     font-weight: 500;
-    color: rgba(0,0,0,.6);
+    color: #ff94b5;
     cursor: pointer;
-    background-color: #eceff1;
+    background-color: #000000;
+    border: 3px solid #ff7da4!important;
     border-radius: 16px;
     -webkit-transition: opacity .3s linear;
     transition: opacity .3s linear;
     word-wrap: break-word;
     text-transform: none;
-    margin-top: 20px;
+    margin-top: 2px;
     margin-bottom: 5px;
+        font-family: 'Montserrat', sans-serif;
+}
+.chip:hover {
+    color: #ffb9cd!important;
+        border: 3px solid #ffb9cd!important;
+}
+.table-striped tbody tr:nth-of-type(odd){
+background-color: #f8a4bd!important;
+color: #020202!important;
+    font-family: 'Montserrat', sans-serif;
+        font-size: 16px!important;
+}
+.table-striped tbody tr:nth-of-type(even){
+background-color: #212121!important;
+color: #f8a4bd!important;
+    font-family: 'Montserrat', sans-serif;
+        font-size: 16px!important;
+}
+thead{
+background-color: #000000!important;
+color: #f8a4bd!important;
+}
+th{
+border-top: 1px solid #000000!important;
+}
+.table thead th{
+border-bottom: 2px solid #000000!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+}
+.table td{
+border-top: 1px solid #f8a4bd!important;
+}
+.btnrem {
+background-color: #f5bbcc!important;
+border: 3px solid #000000!important;
+-webkit-box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1);
+color: #020202!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+}
+.btnadd{
+background-color: #000000!important;
+border: 3px solid #f5bbcc!important;
+color: #f8a4bd!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+
+.btn1{
+background-color: #101010!important;
+border: 3px solid #daa4ff!important;
+color: #daa4ff!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+
+
+.btn2{
+background-color: #101010!important;
+border: 3px solid #ff945c!important;
+color: #ff945c!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+.btn3{
+background-color: #101010!important;
+border: 3px solid #ff5472!important;
+color: #ff5472!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+.sendmail
+{
+margin-bottom: 10px;
+background-color: #101010!important;
+border: 3px solid #ffe478!important;
+color: #ffe478!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+
+.pagini{
+background-color: #000000!important;
+border: 3px solid #f5bbcc!important;
+color: #f8a4bd!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+.pagini:hover{
+background-color: #171717!important;
+border: 3px solid #f6ccd8!important;
+color: #f6ccd8!important;
 }
 </style>
 
 @if (_emails.Count > 0)
 {
-    <button class="btn page-link" @onclick="() => PrintData()">Press to send email</button>
+    <button class="btn page-link sendmail" @onclick="() => PrintData()">Press to send email</button>
     @foreach (var value in _emails)
     {
         <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => AddSelectedEmployee(value)">@value <b> X</b></button>
@@ -48,16 +171,16 @@
 else
 {
     <div class="table-wrapper-scroll-y">
-        <table class="table table-bordered table-striped">
+        <table class="table table-striped">
             <thead>
             <tr>
-                <th>Action</th>
-                <th>Select</th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Email</th>
-                <th>Phone number</th>
-                <th>Position</th>
+                <th>ACTION</th>
+                <th>SELECT</th>
+                <th>FIRST NAME</th>
+                <th>LAST NAME</th>
+                <th>EMAIL</th>
+                <th>PHONE NUMBER</th>
+                <th>POSITION</th>
             </tr>
             </thead>
             <tbody>
@@ -66,19 +189,19 @@ else
                 <tr>
                     <td>
                         <div>
-                            <button class="btn-primary btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
-                            <button class="btn-warning btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
-                            <button class="btn btn-danger" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
+                            <button class="btn1 btn" type="button" @onclick="(() => ShowEmployee(d.Id))">See details</button>
+                            <button class="btn2 btn" type="button" @onclick="(() => EditEmployee(d.Id))">Edit</button>
+                            <button class="btn btn3" type="submit" @onclick="(() => DeleteEmployee(d.Id))">Delete</button>
                         </div>
                     </td>
                     <td>
                         @if (_emails.Contains(d.Email))
                         {
-                            <button class="btn page-link" @onclick="(() => AddSelectedEmployee(d.Email))">Remove from email list</button>
+                            <button class="btn btnrem page-link" @onclick="(() => AddSelectedEmployee(d.Email))">REMOVE</button>
                         }
                         else
                         {
-                            <button class="btn page-link" @onclick="(() => AddSelectedEmployee(d.Email))">Add to email list</button>
+                            <button class="btn btnadd page-link" @onclick="(() => AddSelectedEmployee(d.Email))">ADD </button>
                         }
                     </td>
                     <td>@d.FirstName</td>
@@ -95,34 +218,34 @@ else
     <nav aria-label="Page navigation example">
         <ul class="pagination">
             <li class="page-item">
-                <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">Previous</button>
+                <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.PreviousPage))">PREVIOUS</button>
             </li>
             @if (_data.PageNumber > 1)
             {
                 <li class="page-item">
-                    <button class="btn page-link" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
+                    <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
                 </li>
             }
             @if (_data.PageNumber > 2)
             {
                 <li class="page-item">
-                    <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
+                    <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
                 </li>
             }
             <li class="page-item">
-                <button class="btn page-link">@_data.PageNumber</button>
+                <button class="btn page-link pagini">@_data.PageNumber</button>
             </li>
             @if (_data.NextPage != null && _data.PageNumber < _data.TotalPages)
             {
                 <li class="page-item">
-                    <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
+                    <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
                 </li>
             }
             <li class="page-item">
-                <button class="btn page-link" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
+                <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
             </li>
             <li class="page-item">
-                <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">Next</button>
+                <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.NextPage))">NEXT</button>
             </li>
         </ul>
     </nav>
