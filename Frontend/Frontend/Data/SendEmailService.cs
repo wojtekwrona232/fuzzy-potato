@@ -41,6 +41,29 @@ namespace Frontend.Data
                 new Uri("https://localhost:5001/api/EmployeeGet/emails"));
         }
 
+        public async Task<HttpResponseMessage> SendEmail(SendEmailModel model)
+        {
+            var client = _clientFactory.CreateClient();
+
+            var fixBody = model.Body;
+            var fixSig = model.Signature;
+            model.Body = fixBody;
+            model.Signature = fixSig;
+            var serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            var json = JsonConvert.SerializeObject(model, serializerSettings);
+            var builder = new UriBuilder("https://localhost:6001/api/EmailSender");
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            //query["dto"] = HttpUtility.UrlEncode(json);
+            query["dto"] = json;
+            builder.Query = query.ToString();
+            var uri = builder.ToString();
+            
+            return await client.PostAsync(uri, null);
+        }
+        
         public async Task<HttpResponseMessage> SendEmail(SendEmailModel model, IEnumerable<IBrowserFile>? files)
         {
             var client = _clientFactory.CreateClient();
@@ -60,7 +83,7 @@ namespace Frontend.Data
             query["dto"] = json;
             builder.Query = query.ToString();
             var uri = builder.ToString();
-
+            
             if (!files.Any())
             {
                 return await client.PostAsync(uri, null);
@@ -72,14 +95,14 @@ namespace Frontend.Data
                 var stream = file.OpenReadStream(20000000);
                 var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
-                var streamContent = new StreamContent(memoryStream);
                 
+                var streamContent = new StreamContent(memoryStream);
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                 filesFormData.Add(streamContent, "files", file.Name);
-                memoryStream.Position = 0;
             }
-
+            
             return await client.PostAsync(uri, filesFormData);
         }
+        
     }
 }

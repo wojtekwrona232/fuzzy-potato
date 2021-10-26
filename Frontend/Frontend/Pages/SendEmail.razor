@@ -3,9 +3,13 @@
 @using Frontend.Exceptions
 @using System.Threading
 @using System.Net.Sockets
+@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Logging
 @inject SendEmailService _sendEmailService
 @inject NavigationManager _navigationManager
 @inject IJSRuntime JsRuntime
+@inject IWebHostEnvironment Environment
 
 <style>
 @@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
@@ -209,28 +213,28 @@ else
                         <label for="Signature">Signature</label>
                         <InputTextArea id="Signature" @bind-Value="EmailBodyModel.Signature" class="form-control"/>
                     </div>
-                <div class="form-group">
-                    <p>Maximum total file size is 20MB</p>
-                    @if (_totalFileSize >= 2e+7)
-                    {
-                        <p style="color: darkred">Selected files are larger than 20MB!</p>
-                    }
-                    <InputFile OnChange="@LoadFiles" multiple/>
-                    <br/>
-                    @if (_files.Count > 0)
-                    {
-                        @foreach (var value in _files)
-                        {
-                            <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => RemoveFileFromList(value)">@value.Name - (@(value.Size / 1024)KB)</button>
-                        }
-                    }
-                </div>
-                @if (_totalFileSize < 2e+7)
-                {
-                    <div class="mt-2">
+                @* <div class="form-group"> *@
+                @*     <p>Maximum total file size is 20MB</p> *@
+                @*     @if (_totalFileSize >= 2e+7) *@
+                @*     { *@
+                @*         <p style="color: darkred">Selected files are larger than 20MB!</p> *@
+                @*     } *@
+                @*     <InputFile OnChange="@LoadFiles" multiple/> *@
+                @*     <br/> *@
+                @*     @if (_files.Count > 0) *@
+                @*     { *@
+                @*         @foreach (var value in _files) *@
+                @*         { *@
+                @*             <button class="btn btn-link chip" role="button" aria-disabled="true" @onclick="() => RemoveFileFromList(value)">@value.Name - (@(value.Size / 1024)KB)</button> *@
+                @*         } *@
+                @*     } *@
+                @* </div> *@
+                @* @if (_totalFileSize < 2e+7) *@
+                @* { *@
+                     <div class="mt-2">
                         <button type="submit" class="btn buttons btn-primary">Send email</button>
                     </div>
-                }
+                @* } *@
                 </EditForm>
             </div>
         </div>
@@ -242,7 +246,7 @@ else
     [Parameter]
     public string? Emails { get; set; }
     private long _totalFileSize;
-    private readonly List<IBrowserFile> _files = new();
+    //private readonly List<IBrowserFile> _files = new();
     private ICollection<EmployeeEmailModel> EmailModelCollection { get; set; }
     private SendEmailModel SendEmailModel { get; } = new();
     private EmailBodyModel EmailBodyModel { get; } = new();
@@ -278,25 +282,34 @@ else
         }
     }
 
-    void LoadFiles(InputFileChangeEventArgs e)
-    {
-        foreach (var file in e.GetMultipleFiles())
-        {
-            _loading = true;
-            if (!_files.Contains(file))
-            {
-                _files.Add(file);
-                _totalFileSize += file.Size;
-            }
-        }
-    }
+    // async void LoadFiles(InputFileChangeEventArgs e)
+    // {
+    //     foreach (var file in e.GetMultipleFiles())
+    //     {
+    //         _loading = true;
+    //         
+    //         if (!_files.Contains(file))
+    //         {
+    //             _files.Add(file);
+    //
+    //             var trustedFileNameForFileStorage = Path.GetRandomFileName();
+    //             var path = Path.Combine(Environment.ContentRootPath,
+    //                 Environment.EnvironmentName, "unsafe_uploads", trustedFileNameForFileStorage);
+    //             await using FileStream fs = new(path, FileMode.Create);
+    //             await file.OpenReadStream(20000000).CopyToAsync(fs);
+    //
+    //             //_files.Add(file);
+    //             _totalFileSize += file.Size;
+    //         }
+    //     }
+    // }
     
-    void RemoveFileFromList(IBrowserFile e)
-    {
-        if (!_files.Contains(e)) return;
-        _files.Remove(e);
-        _totalFileSize -= e.Size;
-    }
+    // void RemoveFileFromList(IBrowserFile e)
+    // {
+    //     if (!_files.Contains(e)) return;
+    //     _files.Remove(e);
+    //     _totalFileSize -= e.Size;
+    // }
     
     async void HandleOnValidSubmit()
     {
@@ -309,7 +322,8 @@ else
 
         try
         {
-            var resp = await _sendEmailService.SendEmail(SendEmailModel, _files);
+            var resp = await _sendEmailService.SendEmail(SendEmailModel);
+            //var resp = await _sendEmailService.SendEmail(SendEmailModel, _files);
             if (resp.IsSuccessStatusCode)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Email has been sent");
