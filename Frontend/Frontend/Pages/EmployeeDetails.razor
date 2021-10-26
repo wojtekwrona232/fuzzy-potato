@@ -80,7 +80,14 @@ padding-left: 10px!important;
 </tr>
 <tr>
     <th>Date of hire</th>
-    <td>@_employee.DateOfHire.ToShortDateString()</td>
+    @if (_employee.DateOfHire == default)
+    {
+        <td></td>
+    }
+    else
+    {
+        <td>@_employee.DateOfHire.ToShortDateString()</td>
+    }
 </tr>
     @if (_employee.DateOfDismission != null)
     {
