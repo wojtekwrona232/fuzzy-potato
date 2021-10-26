@@ -1,4 +1,5 @@
 ﻿@page "/edit-employee/{id:guid}"
+@using System.Net.Sockets
 
 @inject EmployeeService _employeeService
 @inject NavigationManager _navigationManager
@@ -243,7 +244,17 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
 
     protected override async Task OnInitializedAsync()
     {
-        _employee = await _employeeService.GetEmployee(Id);
+        try
+        {
+            _employee = await _employeeService.GetEmployee(Id);
+        }
+        catch (Exception exception)
+        {
+            if (exception is HttpRequestException or SocketException)
+            {
+                _navigationManager.NavigateTo("/no-connection-to-server");
+            }
+        }
         NameModel.FirstName = _employee.FirstName;
         NameModel.LastName = _employee.LastName;
         DobModel.DateOfBirth = _employee.DateOfBirth;
@@ -359,6 +370,5 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
             _navigationManager.NavigateTo($"/edit-employee/{Id}", true);
         }
     }
-
-
+    
 }

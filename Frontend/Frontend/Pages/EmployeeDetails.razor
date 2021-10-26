@@ -1,4 +1,5 @@
 ﻿@page "/details/{id:guid}"
+@using System.Net.Sockets
 
 @inject NavigationManager _navigationManager
 @inject EmployeeService _employeeService
@@ -131,7 +132,17 @@ padding-left: 10px!important;
 
     protected override async Task OnInitializedAsync()
     {
-        _employee = _employeeService.GetEmployeeInfo(Id);
+        try
+        {
+            _employee = _employeeService.GetEmployeeInfo(Id);
+        }
+        catch (Exception exception)
+        {
+            if (exception is HttpRequestException or SocketException)
+            {
+                _navigationManager.NavigateTo("/no-connection-to-server");
+            }
+        }
     }
 
     void EditEmployee(Guid id)

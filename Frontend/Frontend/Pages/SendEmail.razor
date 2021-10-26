@@ -2,6 +2,7 @@
 @page "/send-email/{emails?}"
 @using Frontend.Exceptions
 @using System.Threading
+@using System.Net.Sockets
 @inject SendEmailService _sendEmailService
 @inject NavigationManager _navigationManager
 @inject IJSRuntime JsRuntime
@@ -256,7 +257,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        EmailModelCollection = await _sendEmailService.GetBasic();
+        try
+        {
+            EmailModelCollection = await _sendEmailService.GetBasic();
+        }
+        catch (Exception exception)
+        {
+            if (exception is HttpRequestException or SocketException)
+            {
+                _navigationManager.NavigateTo("/no-connection-to-server");
+            }
+        }
+        
         _totalFileSize = 0;
         
         if (Emails != null)
@@ -304,21 +316,12 @@ else
                 _navigationManager.NavigateTo("/send-email", true);
             }
         }
-        catch (ArgumentNullException e)
+        catch (Exception exception)
         {
-            Console.WriteLine("Arg null exceptions");
-        }
-        catch (NullReferenceException e)
-        {
-            await JsRuntime.InvokeVoidAsync("alert", "Cannot send empty email");
-        }
-        catch (FileNullException e)
-        {
-            Console.WriteLine("File null exceptions");
-        }
-        catch (FileTooBigException e)
-        {
-            await JsRuntime.InvokeVoidAsync("alert", "Files size is too big. Maximum is 20MB");
+            if (exception is HttpRequestException or SocketException)
+            {
+                _navigationManager.NavigateTo("/no-connection-to-server");
+            }
         }
         
     }
