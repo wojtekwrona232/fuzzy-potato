@@ -27,10 +27,6 @@ namespace Emails.Controllers
                 throw new ArgumentNullException(nameof(dto));
             }
 
-            Console.WriteLine(dto.Body);
-            Console.WriteLine(dto.Signature);
-            Console.WriteLine(dto.Subject);
-
             var mailAddress = "apitestinguser69@gmail.com";
             var mailPassword = "5LT98wssY4675x7SV9mRAxt75EY6shUA67K9MNoxcD";
 
