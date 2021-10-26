@@ -190,6 +190,37 @@ width: 13px;
 color: red!important;
 background-color: blue!important;
 }
+
+.sendmail
+{
+margin-bottom: 10px;
+background-color: #101010!important;
+border: 3px solid #ffe478!important;
+color: #ffe478!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+.pagini{
+margin-top: 10px!important;
+background-color: #000000!important;
+border: 3px solid #f5bbcc!important;
+color: #f8a4bd!important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 16px!important;
+-webkit-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+-moz-box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+box-shadow: 0px 0px 2px 0px rgba(66, 68, 90, 1);
+}
+.pagini:hover{
+background-color: #171717!important;
+border: 3px solid #f6ccd8!important;
+color: #f6ccd8!important;
+}
 </style>
 <div class="container">
 <div class="h3">Search for employees</div>
@@ -345,34 +376,34 @@ background-color: blue!important;
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
                         <li class="page-item">
-                            <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">Previous</button>
+                            <button class="btn pagini page-link" @onclick="(() => RenderPage(_data.PreviousPage))">Previous</button>
                         </li>
                         @if (_data.PageNumber > 1)
                         {
                             <li class="page-item">
-                                <button class="btn page-link" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
+                                <button class="btn pagini page-link" @onclick="(() => RenderPage(_data.FirstPage))">1</button>
                             </li>
                         }
                         @if (_data.PageNumber > 2)
                         {
                             <li class="page-item">
-                                <button class="btn page-link" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
+                                <button class="btn pagini page-link" @onclick="(() => RenderPage(_data.PreviousPage))">@(_data.PageNumber - 1)</button>
                             </li>
                         }
                         <li class="page-item">
-                            <button class="btn page-link">@_data.PageNumber</button>
+                            <button class="btn pagini page-link">@_data.PageNumber</button>
                         </li>
                         @if (_data.NextPage != null && _data.PageNumber < _data.TotalPages)
                         {
                             <li class="page-item">
-                                <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
+                                <button class="btn pagini page-link" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
                             </li>
                         }
                         <li class="page-item">
-                            <button class="btn page-link" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
+                            <button class="btn pagini page-link" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
                         </li>
                         <li class="page-item">
-                            <button class="btn page-link" @onclick="(() => RenderPage(_data.NextPage))">Next</button>
+                            <button class="btn pagini page-link" @onclick="(() => RenderPage(_data.NextPage))">Next</button>
                         </li>
                     </ul>
                 </nav>
