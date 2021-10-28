@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Employees.Migrations
 {
     [DbContext(typeof(EmployeesDbContext))]
-    [Migration("20211023161615_DateTypeChange4")]
-    partial class DateTypeChange4
+    [Migration("20211028122911_Final")]
+    partial class Final
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

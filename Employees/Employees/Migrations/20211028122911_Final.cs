@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Employees.Migrations
 {
-    public partial class DateTypeChange2 : Migration
+    public partial class Final : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -19,7 +19,7 @@ namespace Employees.Migrations
                     Gender = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
                     DateOfHire = table.Column<DateTime>(type: "date", nullable: false),
-                    DateOfDismission = table.Column<DateTime>(type: "date", nullable: false),
+                    DateOfDismission = table.Column<DateTime>(type: "date", nullable: true),
                     Salary = table.Column<double>(type: "double precision", precision: 2, nullable: false),
                     Position = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },

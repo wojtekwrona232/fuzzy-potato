@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
+using Npgsql;
 
 namespace Employees.Database
 {
     public class PrepDb
     {
-        public static async void ExecuteMigration(IApplicationBuilder app)
+        public static void ExecuteMigration(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {
@@ -19,15 +20,19 @@ namespace Employees.Database
                 if (!context.Database.CanConnect())
                 {
                     Console.WriteLine("Applying Migrations...");
-                    await context.Database.MigrateAsync();
+                    context.Database.Migrate();
                     Console.WriteLine("Migrations completed");
+
+                    Console.WriteLine("Adding Data...");
+                    PopulateDatabaseWithExampleData(app);
+                    Console.WriteLine("Data was added successfully");
                 }
                 else
                 {
                     Console.WriteLine("Clearing database...");
-                    var toDel = await context.Employees.Include(p => p.Address).ToListAsync();
+                    var toDel = context.Employees.Include(p => p.Address).ToList();
                     context.Employees.RemoveRange(toDel);
-                    await context.SaveChangesAsync();
+                    context.SaveChanges();
 
                     Console.WriteLine("Adding Data...");
                     PopulateDatabaseWithExampleData(app);
@@ -36,7 +41,7 @@ namespace Employees.Database
             }
         }
 
-        private static async void PopulateDatabaseWithExampleData(IApplicationBuilder app)
+        private static void PopulateDatabaseWithExampleData(IApplicationBuilder app)
         {
             var data = ReadCsvDataFiles.CreateEmployees();
 
@@ -44,8 +49,8 @@ namespace Employees.Database
             {
                 var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
 
-                await context.Employees.AddRangeAsync(data);
-                await context.SaveChangesAsync();
+                context.Employees.AddRange(data);
+                context.SaveChanges();
             }
         }
 
