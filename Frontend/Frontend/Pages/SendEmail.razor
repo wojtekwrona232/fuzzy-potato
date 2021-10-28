@@ -290,35 +290,6 @@ else
         }
     }
 
-    // async void LoadFiles(InputFileChangeEventArgs e)
-    // {
-    //     foreach (var file in e.GetMultipleFiles())
-    //     {
-    //         _loading = true;
-    //         
-    //         if (!_files.Contains(file))
-    //         {
-    //             _files.Add(file);
-    //
-    //             var trustedFileNameForFileStorage = Path.GetRandomFileName();
-    //             var path = Path.Combine(Environment.ContentRootPath,
-    //                 Environment.EnvironmentName, "unsafe_uploads", trustedFileNameForFileStorage);
-    //             await using FileStream fs = new(path, FileMode.Create);
-    //             await file.OpenReadStream(20000000).CopyToAsync(fs);
-    //
-    //             //_files.Add(file);
-    //             _totalFileSize += file.Size;
-    //         }
-    //     }
-    // }
-    
-    // void RemoveFileFromList(IBrowserFile e)
-    // {
-    //     if (!_files.Contains(e)) return;
-    //     _files.Remove(e);
-    //     _totalFileSize -= e.Size;
-    // }
-    
     async void HandleOnValidSubmit()
     {
         SendEmailModel.Recipients = Recipients;
@@ -332,11 +303,14 @@ else
         {
             _sending = true;
             var resp = await _sendEmailService.SendEmail(SendEmailModel);
-            //var resp = await _sendEmailService.SendEmail(SendEmailModel, _files);
             if (resp.IsSuccessStatusCode)
             {
                 await JsRuntime.InvokeVoidAsync("alert", "Email has been sent");
                 _navigationManager.NavigateTo("/send-email", true);
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("alert", "Email has not been sent");
             }
         }
         catch (Exception exception)
