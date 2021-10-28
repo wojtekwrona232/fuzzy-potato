@@ -43,7 +43,7 @@
         color: #ffe5ec!important;
             border: 3px solid #ffe5ec!important;
     }
-    .h3{
+    .h3, .loading{
      color: #fc90b0!important;
         font-family: 'Montserrat', sans-serif;
          font-weight: 700;
@@ -232,7 +232,13 @@ else
                 @* @if (_totalFileSize < 2e+7) *@
                 @* { *@
                      <div class="mt-2">
-                        <button type="submit" class="btn buttons btn-primary">Send email</button>
+                         <button type="submit" class="btn buttons btn-primary">Send email</button>
+                         @if (_sending)
+                         {
+                             <div class="spinner-border loading ml-3" role="status">
+                                 <span class="sr-only">Loading...</span>
+                             </div>
+                         }
                     </div>
                 @* } *@
                 </EditForm>
@@ -245,7 +251,7 @@ else
 
     [Parameter]
     public string? Emails { get; set; }
-    private long _totalFileSize;
+    //private long _totalFileSize;
     //private readonly List<IBrowserFile> _files = new();
     private ICollection<EmployeeEmailModel> EmailModelCollection { get; set; }
     private SendEmailModel SendEmailModel { get; } = new();
@@ -254,6 +260,7 @@ else
     private EmailModel CcEmailModel { get; } = new();
     private EmailModel BccEmailModel { get; } = new();
     private bool _loading;
+    private bool _sending;
     
     private ICollection<string> Recipients { get; set; } = new List<string>();
     private ICollection<string> Ccs { get; } = new List<string>();
@@ -273,7 +280,8 @@ else
             }
         }
         
-        _totalFileSize = 0;
+        //_totalFileSize = 0;
+        _sending = false;
         
         if (Emails != null)
         {
@@ -322,6 +330,7 @@ else
 
         try
         {
+            _sending = true;
             var resp = await _sendEmailService.SendEmail(SendEmailModel);
             //var resp = await _sendEmailService.SendEmail(SendEmailModel, _files);
             if (resp.IsSuccessStatusCode)

@@ -74,8 +74,8 @@ namespace Employees
             }
 
             #region migrations
-            //uncoment this line to create the database and add 2k example records into the database
-            //PrepDb.ExecuteMigration(app);
+            //create the database and add 2k example records into the database
+            PrepDb.ExecuteMigration(app);
             #endregion
 
             app.UseCors("CorsPolicy");

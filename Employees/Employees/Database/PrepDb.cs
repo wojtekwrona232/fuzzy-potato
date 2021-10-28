@@ -10,22 +10,33 @@ namespace Employees.Database
 {
     public class PrepDb
     {
-        public static void ExecuteMigration(IApplicationBuilder app)
+        public static async void ExecuteMigration(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
 
-                Console.WriteLine("Applying Migrations...");
-                context.Database.Migrate();
-                Console.WriteLine("Migrations completed");
-                Console.WriteLine("Adding Data...");
-                PopulateDatabaseWithExampleData(app);
-                Console.WriteLine("Data added");
+                if (!context.Database.CanConnect())
+                {
+                    Console.WriteLine("Applying Migrations...");
+                    await context.Database.MigrateAsync();
+                    Console.WriteLine("Migrations completed");
+                }
+                else
+                {
+                    Console.WriteLine("Clearing database...");
+                    var toDel = await context.Employees.Include(p => p.Address).ToListAsync();
+                    context.Employees.RemoveRange(toDel);
+                    await context.SaveChangesAsync();
+
+                    Console.WriteLine("Adding Data...");
+                    PopulateDatabaseWithExampleData(app);
+                    Console.WriteLine("Data was added successfully");
+                }
             }
         }
 
-        private static void PopulateDatabaseWithExampleData(IApplicationBuilder app)
+        private static async void PopulateDatabaseWithExampleData(IApplicationBuilder app)
         {
             var data = ReadCsvDataFiles.CreateEmployees();
 
@@ -33,8 +44,8 @@ namespace Employees.Database
             {
                 var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
 
-                context.Employees.AddRange(data);
-                context.SaveChanges();
+                await context.Employees.AddRangeAsync(data);
+                await context.SaveChangesAsync();
             }
         }
 
