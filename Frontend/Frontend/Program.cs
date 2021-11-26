@@ -24,7 +24,7 @@ namespace Frontend
 
             var hostUrl = configuration["applicationUrl"];
             if (string.IsNullOrEmpty(hostUrl))
-                hostUrl = "https://*:5101;https://0.0.0.0:5101";
+                hostUrl = "https://*:5101;https://0.0.0.0:5101;https://localhost:5101";
 
 
             var host = new WebHostBuilder()

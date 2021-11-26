@@ -33,7 +33,15 @@ namespace Employees.Controllers
         [HttpDelete("remove/{id}")]
         public async Task<IActionResult> DeleteEmployee(Guid id)
         {
-            var employee = await _context.Employees.Include(p => p.Address).FirstAsync(p => p.Id == id);
+            Employee employee;
+            try
+            {
+                employee = await _context.Employees.Include(p => p.Address).FirstAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
             if (employee == null)
             {
                 return NotFound();

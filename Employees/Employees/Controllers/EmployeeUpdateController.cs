@@ -26,9 +26,18 @@ namespace Employees.Controllers
         }
 
         [HttpPut("address/{id}")]
-        public async Task<ActionResult<Address>> ChangeLocation(Guid id, string street, string? zipCode, string city, string? region, string country)
+        public async Task<ActionResult<Address>> ChangeLocation(Guid id, string street, string? zipCode, string city,
+            string? region, string country)
         {
-            var value = await _context.Addresses.SingleOrDefaultAsync(p => p.EmployeeId == id);
+            Address value;
+            try
+            {
+                value = await _context.Addresses.SingleOrDefaultAsync(p => p.EmployeeId == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (value == null)
             {
@@ -65,7 +74,15 @@ namespace Employees.Controllers
         [HttpPut("name/{id}/{firstName}&{lastName}")]
         public async Task<ActionResult<Employee>> ChangeName(Guid id, string firstName, string lastName)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -96,7 +113,16 @@ namespace Employees.Controllers
         [HttpPut("gender/{id}/{gender}")]
         public async Task<ActionResult<Employee>> ChangeGender(Guid id, string gender)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
+
 
             if (user == null)
             {
@@ -118,9 +144,19 @@ namespace Employees.Controllers
         }
 
         [HttpPut("dob/{id}/{dob}")]
-        public async Task<ActionResult<Employee>> ChangeDob(Guid id, [DateOfBirth(MinAge = 15, MaxAge = 110)] DateTime dob)
+        public async Task<ActionResult<Employee>> ChangeDob(Guid id,
+            [DateOfBirth(MinAge = 15, MaxAge = 110)]
+            DateTime dob)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -134,11 +170,19 @@ namespace Employees.Controllers
 
             return user;
         }
-        
+
         [HttpPut("date-hire/{id}/{date}")]
         public async Task<ActionResult<Employee>> ChangeDateHire(Guid id, [DateWithinMonth] DateTime date)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -152,11 +196,19 @@ namespace Employees.Controllers
 
             return user;
         }
-       
+
         [HttpPut("date-dismission/{id}/{date}")]
         public async Task<ActionResult<Employee>> ChangeDateDismission(Guid id, [DateWithinMonth] DateTime date)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -170,17 +222,33 @@ namespace Employees.Controllers
 
             return user;
         }
-        
-        [HttpPut("salary/{id}/{salary}")]
-        public async Task<ActionResult<Employee>> ChangeSalary(Guid id, [Range(0, Double.PositiveInfinity)] double salary)
+
+        [HttpPut("salary/{id}/{value}")]
+        public async Task<ActionResult<Employee>> ChangeSalary(Guid id,
+            string value)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
                 return NotFound();
             }
 
+            var salary = double.Parse(value.Contains(',') ? value.Replace(',', '.') : value);
+
+            if (salary <= 0)
+            {
+                return UnprocessableEntity("Salary is lower or equal to 0");
+            }
+            
             user.Salary = salary;
 
             _context.Entry(user).State = EntityState.Modified;
@@ -188,11 +256,19 @@ namespace Employees.Controllers
 
             return user;
         }
-        
+
         [HttpPut("email/{id}/{email}")]
         public async Task<ActionResult<Employee>> ChangeEmail(Guid id, [EmailAddress] string email)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -206,11 +282,19 @@ namespace Employees.Controllers
 
             return user;
         }
-        
+
         [HttpPut("phone-number/{id}/{phoneNumber}")]
         public async Task<ActionResult<Employee>> ChangePhoneNumber(Guid id, [Phone] string phoneNumber)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -224,11 +308,20 @@ namespace Employees.Controllers
 
             return user;
         }
-        
+
         [HttpPut("position/{id}/{possition}")]
-        public async Task<ActionResult<Employee>> ChangePossition(Guid id, [MinLength(1)] [MaxLength(64)] string possition)
+        public async Task<ActionResult<Employee>> ChangePossition(Guid id,
+            [MinLength(1)] [MaxLength(64)] string possition)
         {
-            var user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            Employee user;
+            try
+            {
+                user = await _context.Employees.SingleOrDefaultAsync(p => p.Id == id);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
 
             if (user == null)
             {
@@ -242,6 +335,5 @@ namespace Employees.Controllers
 
             return user;
         }
-
     }
 }
