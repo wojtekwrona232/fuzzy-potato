@@ -28,6 +28,7 @@ namespace Frontend.Models
         [Required]
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(48, ErrorMessage = "Maximum length is 48")]
+        [RegularExpression(@"^[A-Za-z ]{1,48}$", ErrorMessage = "Contains illegal characters or is too long.")]
         [Display(Name = "Country name")]
         public string Country { get; set; }
     }

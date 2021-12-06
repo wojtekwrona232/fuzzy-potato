@@ -11,6 +11,7 @@ using Employees.Models;
 using System.Text.RegularExpressions;
 using API.Utils;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace Employees.Controllers
 {
@@ -59,6 +60,12 @@ namespace Employees.Controllers
                 return UnprocessableEntity("Country is empty or consists only of white space");
             }
 
+            var reg = new Regex(@"^[A-Za-z ]{1,48}$");
+            if (!reg.IsMatch(country))
+            {
+                return UnprocessableEntity("Country name doesn't meet the required standards");
+            }
+
             value.Street = street;
             value.ZipCode = zipCode;
             value.City = city;
@@ -89,13 +96,13 @@ namespace Employees.Controllers
                 return NotFound();
             }
 
-            var reg = new Regex(@"^[A-Za-z\d ]{1,32}$");
+            var reg = new Regex(@"^[A-Za-z ]{1,32}$");
             if (!reg.IsMatch(firstName))
             {
                 return UnprocessableEntity("First name doesn't meet the required standards");
             }
 
-            var regex = new Regex(@"^[A-Za-z\d ]{1,32}$");
+            var regex = new Regex(@"^[A-Za-z ]{1,32}$");
             if (!regex.IsMatch(lastName))
             {
                 return UnprocessableEntity("Last name doesn't meet the required standards");
@@ -224,8 +231,7 @@ namespace Employees.Controllers
         }
 
         [HttpPut("salary/{id}/{value}")]
-        public async Task<ActionResult<Employee>> ChangeSalary(Guid id,
-            string value)
+        public async Task<ActionResult<Employee>> ChangeSalary(Guid id, string value)
         {
             Employee user;
             try
@@ -242,13 +248,14 @@ namespace Employees.Controllers
                 return NotFound();
             }
 
-            var salary = double.Parse(value.Contains(',') ? value.Replace(',', '.') : value);
+            var v = value.Contains(",") ? value.Replace(",", ".") : value;
+            var salary = double.Parse(v, NumberStyles.Any, CultureInfo.InvariantCulture);
 
             if (salary <= 0)
             {
                 return UnprocessableEntity("Salary is lower or equal to 0");
             }
-            
+
             user.Salary = salary;
 
             _context.Entry(user).State = EntityState.Modified;
@@ -309,9 +316,9 @@ namespace Employees.Controllers
             return user;
         }
 
-        [HttpPut("position/{id}/{possition}")]
+        [HttpPut("position/{id}/{position}")]
         public async Task<ActionResult<Employee>> ChangePossition(Guid id,
-            [MinLength(1)] [MaxLength(64)] string possition)
+            [MinLength(1)] [MaxLength(64)] string position)
         {
             Employee user;
             try
@@ -328,7 +335,13 @@ namespace Employees.Controllers
                 return NotFound();
             }
 
-            user.Position = possition;
+            var reg = new Regex(@"^[A-Za-z ]{3,64}$");
+            if (!reg.IsMatch(position))
+            {
+                return UnprocessableEntity("Position name doesn't meet the required standards");
+            }
+
+            user.Position = position;
 
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();

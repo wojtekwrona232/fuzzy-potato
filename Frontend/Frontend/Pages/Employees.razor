@@ -242,9 +242,12 @@ else
                     <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.NextPage))">@(_data.PageNumber + 1)</button>
                 </li>
             }
-            <li class="page-item">
-                <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
-            </li>
+            @if (_data.TotalPages != _data.PageNumber && _data.NextPage != null)
+            {
+                <li class="page-item">
+                    <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.LastPage))">@(_data.TotalPages)</button>
+                </li>
+            }
             <li class="page-item">
                 <button class="btn page-link pagini" @onclick="(() => RenderPage(_data.NextPage))">NEXT</button>
             </li>

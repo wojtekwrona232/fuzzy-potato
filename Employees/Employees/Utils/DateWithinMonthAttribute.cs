@@ -22,8 +22,8 @@ namespace API.Utils
 
             var val = (DateTime) value;
             var val2 = DateTime.Now;
-            var dayDiff = val2.Subtract(val).Days / (365.25 / 12);
-
+            var dayDiff = Math.Abs(val2.Subtract(val).Days);
+            
             return dayDiff < 30;
         }
     }

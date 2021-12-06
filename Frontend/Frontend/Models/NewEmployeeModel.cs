@@ -9,12 +9,14 @@ namespace Frontend.Models
         [Required]
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(32, ErrorMessage = "Minimum length is 32")]
+        [RegularExpression(@"^[A-Za-z ]{1,32}$")]
         [Display(Name = "First name")]
         public string FirstName { get; set; }
         
         [Required]
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(32, ErrorMessage = "Minimum length is 32")]
+        [RegularExpression(@"^[A-Za-z ]{1,32}$")]
         [Display(Name = "Last name")]
         public string LastName { get; set; }
         
@@ -31,6 +33,7 @@ namespace Frontend.Models
         [MaxLength(64, ErrorMessage = "Maximum length is 64")]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
+        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$")]
         [Display(Name = "Email address")]
         public string Email { get; set; }
         
@@ -38,16 +41,18 @@ namespace Frontend.Models
         [DataType(DataType.Date)]
         [DateOfBirth(MinAge = 15, MaxAge = 110)] 
         [Display(Name = "Date of birth")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; } = DateTime.Now;
         
         [Required]
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(20, ErrorMessage = "Maximum length is 20")]
+        [RegularExpression(@"^[A-Za-z ]{1,20}$")]
         [Display(Name = "Gender")]
         public string Gender { get; set; }
         
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(20, ErrorMessage = "Maximum length is 20")]
+        [RegularExpression(@"^[A-Za-z ]{1,20}$")]
         [Display(Name = "Gender")]
         public string? GenderInput { get; set; }
 
@@ -74,12 +79,14 @@ namespace Frontend.Models
         [Required]
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(48, ErrorMessage = "Maximum length is 48")]
+        [RegularExpression(@"^[A-Za-z ]{1,48}$", ErrorMessage = "Contains illegal characters or is too long.")]
         [Display(Name = "Country name")]
         public string Country { get; set; }
         
         [Required]
         [MinLength(1, ErrorMessage = "Minimum length is 1")]
         [MaxLength(64, ErrorMessage = "Maximum length is 64")]
+        [RegularExpression(@"^[A-Za-z ]{3,64}$", ErrorMessage = "Contains illegal characters or is too long.")]
         [Display(Name = "Position name")]
         public string Position { get; set; }
         
@@ -92,7 +99,7 @@ namespace Frontend.Models
         [DataType(DataType.Date)]
         [DateWithinMonth]
         [Display(Name = "Date of hire")]
-        public DateTime DateOfHire { get; set; }
+        public DateTime DateOfHire { get; set; } = DateTime.Now;
         
     }
 }

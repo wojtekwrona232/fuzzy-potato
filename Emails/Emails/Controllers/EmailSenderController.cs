@@ -23,8 +23,8 @@ namespace Emails.Controllers
         public async Task<IActionResult> SendEmail([ModelBinder(BinderType = typeof(JsonModelBinder))] EmailDto dto)
         {
             #region loginData
-            var mailAddress = "apitestinguser69@gmail.com";
-            var mailPassword = "5LT98wssY4675x7SV9mRAxt75EY6shUA67K9MNoxcD";
+            const string mailAddress = "apitestinguser69@gmail.com";
+            const string mailPassword = "5LT98wssY4675x7SV9mRAxt75EY6shUA67K9MNoxcD";
             #endregion loginData
 
             try
@@ -57,8 +57,10 @@ namespace Emails.Controllers
                 bccs.Add(MailboxAddress.Parse(rcpt));
             }
 
-            var bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = "<p>" + dto.Body + "</p><br/><p>" + dto.Signature + "</p>";
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = "<p>" + dto.Body + "</p><br/><p>" + dto.Signature + "</p>"
+            };
 
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(mailAddress));
@@ -70,13 +72,11 @@ namespace Emails.Controllers
 
             try
             {
-                using (var smtp = new SmtpClient())
-                {
-                    await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-                    await smtp.AuthenticateAsync(mailAddress, mailPassword);
-                    await smtp.SendAsync(email);
-                    await smtp.DisconnectAsync(true);
-                }
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(mailAddress, mailPassword);
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
             }
             catch (Exception e)
             {

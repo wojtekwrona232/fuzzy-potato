@@ -29,6 +29,7 @@ namespace Employees.Models
         [Required]
         [MinLength(1)]
         [MaxLength(48)]
+        [RegularExpression(@"^[A-Za-z ]{1,48}$")]
         public string Country { get; set; }
 
         public Guid EmployeeId { get; set; }

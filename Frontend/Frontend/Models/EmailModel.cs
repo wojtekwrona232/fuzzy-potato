@@ -9,6 +9,7 @@ namespace Frontend.Models
         [MaxLength(64, ErrorMessage = "Maximum length is 64")]
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
+        [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$")]
         [Display(Name = "Email address")]
         public string Email { get; set; }
     }
