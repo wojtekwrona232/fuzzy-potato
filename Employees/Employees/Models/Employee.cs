@@ -51,13 +51,13 @@ namespace Employees.Models
 
         [Required]
         [DataType(DataType.Date)]
-        [DateOfBirth(MinAge = 15, MaxAge = 110)]
+        [DateWithinMonth]
         public DateTime DateOfHire { get; set; }
 
         [DataType(DataType.Date)] public Nullable<DateTime> DateOfDismission { get; set; }
 
         [Required]
-        [Range(0.0, Double.PositiveInfinity)]
+        [Range(0.0, 100000.0)]
         public double Salary { get; set; }
 
         [Required]
@@ -66,6 +66,5 @@ namespace Employees.Models
         [RegularExpression(@"^[A-Za-z ]{1,64}$")]
         public string Position { get; set; }
 
-        public Address Address { get; set; }
     }
 }

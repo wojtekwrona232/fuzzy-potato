@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Employees.Services;
+using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 
 namespace Employees
@@ -31,26 +33,22 @@ namespace Employees
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             var server = Configuration["DBServer"] ?? "localhost";
             var port = Configuration["DBPort"] ?? "5432";
             var user = Configuration["DBUser"] ?? "empDb";
             var password = Configuration["DBPassword"] ?? "oJ6YV!524A&Gn6%@6f5$v3!n%Y%49SMj";
             var database = Configuration["DBName"] ?? "employees";
 
-            services.AddControllers();
-            services.AddDbContext<EmployeesDbContext>(optionsAction =>
-                optionsAction.UseNpgsql($"Host={server};Port={port};Database={database};Username={user};Password={password}"));
+            services.AddDbContext<EmployeesDbContext>(optionsAction => optionsAction
+                .UseNpgsql($"Host={server};Port={port};Database={database};Username={user};Password={password}")
+                .UseSnakeCaseNamingConvention());
             services.AddHttpContextAccessor();
-            services.AddCors(options =>
-            {
-                options.AddPolicy(
-                  "CorsPolicy",
-                  builder => builder.WithOrigins("http://localhost:4200")
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials());
-            });
+            
+            services.AddScoped<IGetService, GetService>();
+            services.AddScoped<IUpdateService, UpdateService>();
+            services.AddScoped<ICreateService, CreateService>();
+            services.AddScoped<IDeleteService, DeleteService>();
+            
             services.AddSingleton<IUriService>(o =>
             {
                 var accessor = o.GetRequiredService<IHttpContextAccessor>();
@@ -58,7 +56,10 @@ namespace Employees
                 var uri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
                 return new UriService(uri);
             });
-            services.AddControllers().AddNewtonsoftJson(options => 
+            
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 options.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
@@ -74,11 +75,11 @@ namespace Employees
             }
 
             #region migrations
-            //create the database and add 2k example records into the database
-            //PrepDb.ExecuteMigration(app);
-            #endregion
 
-            app.UseCors("CorsPolicy");
+            //create the database and add 2k example records into the database
+            PrepDb.ExecuteMigration(app);
+
+            #endregion
 
             app.UseHttpsRedirection();
 
@@ -86,10 +87,7 @@ namespace Employees
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

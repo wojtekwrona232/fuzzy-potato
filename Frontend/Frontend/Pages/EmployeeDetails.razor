@@ -53,6 +53,9 @@ padding-left: 10px!important;
 </style>
 <h3>Details</h3>
 
+@if (_employee != null)
+{
+    
 <tbody>
 <tr>
     <th>First name</th>
@@ -130,6 +133,12 @@ padding-left: 10px!important;
     </div>
 </div>
 
+}
+else
+{
+    <div style="color: whitesmoke">Employee not found in this area.</div>
+}
+
 @code {
     
     [Parameter]
@@ -145,9 +154,15 @@ padding-left: 10px!important;
         }
         catch (Exception exception)
         {
-            if (exception is HttpRequestException or SocketException)
+            Console.WriteLine(exception.Message);
+            switch (exception)
             {
-                _navigationManager.NavigateTo("/no-connection-to-server");
+                case HttpRequestException or SocketException:
+                    _navigationManager.NavigateTo("/no-connection-to-server");
+                    break;
+                case NullReferenceException:
+                    _navigationManager.NavigateTo("/");
+                    break;
             }
         }
     }

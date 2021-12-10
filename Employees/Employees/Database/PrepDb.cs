@@ -9,35 +9,33 @@ using Npgsql;
 
 namespace Employees.Database
 {
-    public class PrepDb
+    public static class PrepDb
     {
         public static void ExecuteMigration(IApplicationBuilder app)
         {
-            using (var serviceScope = app.ApplicationServices.CreateScope())
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
+
+            if (context != null && !context.Database.CanConnect())
             {
-                var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
+                Console.WriteLine("Applying Migrations...");
+                context.Database.Migrate();
+                Console.WriteLine("Migrations completed");
 
-                if (!context.Database.CanConnect())
-                {
-                    Console.WriteLine("Applying Migrations...");
-                    context.Database.Migrate();
-                    Console.WriteLine("Migrations completed");
+                Console.WriteLine("Adding Data...");
+                PopulateDatabaseWithExampleData(app);
+                Console.WriteLine("Data was added successfully");
+            }
+            else
+            {
+                Console.WriteLine("Clearing database...");
+                var toDel = context.Employees.ToList();
+                context.Employees.RemoveRange(toDel);
+                context.SaveChanges();
 
-                    Console.WriteLine("Adding Data...");
-                    PopulateDatabaseWithExampleData(app);
-                    Console.WriteLine("Data was added successfully");
-                }
-                else
-                {
-                    Console.WriteLine("Clearing database...");
-                    var toDel = context.Employees.Include(p => p.Address).ToList();
-                    context.Employees.RemoveRange(toDel);
-                    context.SaveChanges();
-
-                    Console.WriteLine("Adding Data...");
-                    PopulateDatabaseWithExampleData(app);
-                    Console.WriteLine("Data was added successfully");
-                }
+                Console.WriteLine("Adding Data...");
+                PopulateDatabaseWithExampleData(app);
+                Console.WriteLine("Data was added successfully");
             }
         }
 
@@ -45,13 +43,12 @@ namespace Employees.Database
         {
             var data = ReadCsvDataFiles.CreateEmployees();
 
-            using (var serviceScope = app.ApplicationServices.CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            var context = serviceScope.ServiceProvider.GetService<EmployeesDbContext>();
 
-                context.Employees.AddRange(data);
-                context.SaveChanges();
-            }
+            if (context == null) return;
+            context.Employees.AddRange(data);
+            context.SaveChanges();
         }
 
     }

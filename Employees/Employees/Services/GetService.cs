@@ -1,57 +1,47 @@
-﻿using Employees.Database;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Employees.Database;
 using Employees.Dtos;
 using Employees.Models;
 using Employees.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Employees.Controllers
+namespace Employees.Services
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EmployeeGetController : ControllerBase
+    public class GetService : IGetService
     {
         private readonly EmployeesDbContext _context;
         private readonly IUriService _uriService;
 
-        public EmployeeGetController(EmployeesDbContext context, IUriService uriService)
+        public GetService(EmployeesDbContext context, IUriService uriService)
         {
             _context = context;
             _uriService = uriService;
         }
 
-        [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
-            return await _context.Employees.Include(p => p.Address).ToListAsync();
+            return await _context.Employees.ToListAsync();
         }
 
-        [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(Guid id)
         {
             Employee employee;
             try
             {
-                employee = await _context.Employees.Include(p => p.Address).FirstOrDefaultAsync(p => p.Id == id);
+                employee = await _context.Employees.FirstOrDefaultAsync(p => p.Id == id);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return NotFound();
-            }
-
-            if (employee == null)
-            {
-                return NotFound();
+                return null;
             }
 
             return employee;
         }
 
-        [HttpGet("basic-info")]
         public async Task<ActionResult<ICollection<EmployeeBasicDataDto>>> GetAllEmployeesBasic(int? orderBy,
             bool orderByDesc)
         {
@@ -88,7 +78,6 @@ namespace Employees.Controllers
                     }).ToListAsync();
         }
 
-        [HttpGet("basic-info/filter/advanced")]
         public async Task<ActionResult<ICollection<EmployeeBasicDataDto>>> GetAllEmployeesAdvancedFiltered(
             string? email, string? firstName,
             string? lastName, string? phoneNumber, string? position, int? orderBy, bool orderByDesc)
@@ -136,7 +125,6 @@ namespace Employees.Controllers
                     }).ToListAsync();
         }
 
-        [HttpGet("basic-info/filter/basic")]
         public async Task<ActionResult<ICollection<EmployeeBasicDataDto>>> GetAllEmployeesBasicFiltered(string? search,
             int? orderBy, bool orderByDesc)
         {
@@ -183,10 +171,9 @@ namespace Employees.Controllers
                     }).ToListAsync();
         }
 
-        [HttpGet("basic-info/paged")]
-        public async Task<IActionResult> GetAllEmployeesBasic([FromQuery] PaginationFilter filter)
+        public async Task<PagedResponse<List<EmployeeBasicDataDto>>> GetAllEmployeesBasicPaged(
+            [FromQuery] PaginationFilter filter, string? route)
         {
-            var route = Request.Path.Value;
             var paginationFilter =
                 new PaginationFilter(filter.PageNumber, filter.PageSize, filter.OrderBy, filter.OrderByDesc);
             var query = paginationFilter.OrderByDesc
@@ -225,15 +212,13 @@ namespace Employees.Controllers
                         Position = p.Position
                     }).ToListAsync();
             var totalRec = await _context.Employees.CountAsync();
-            var paged = PaginationHelper.CreatePagedReponse<EmployeeBasicDataDto>(query, paginationFilter, totalRec,
-                _uriService, route);
-            return Ok(paged);
+            var paged = PaginationHelper.CreatePagedReponse(query, paginationFilter, totalRec, _uriService, route);
+            return paged;
         }
 
-        [HttpGet("basic-info/paged/filter/advanced")]
-        public async Task<IActionResult> GetAllEmployeesAdvancedFiltered([FromQuery] PaginationFilterAdvanced filter)
+        public async Task<PagedResponse<List<EmployeeBasicDataDto>>> GetAllEmployeesAdvancedFilteredPaged(
+            [FromQuery] PaginationFilterAdvanced filter, string? route)
         {
-            var route = Request.Path.Value;
             var paginationFilter = new PaginationFilterAdvanced(filter.PageNumber, filter.PageSize, filter.Email,
                 filter.FirstName, filter.LastName,
                 filter.PhoneNumber, filter.Position, filter.OrderBy, filter.OrderByDesc);
@@ -314,13 +299,12 @@ namespace Employees.Controllers
                                 : paginationFilter.Position.ToLower())).CountAsync();
             var paged = PaginationHelper.CreatePagedReponseAdvanced<EmployeeBasicDataDto>(query, paginationFilter,
                 totalRec, _uriService, route);
-            return Ok(paged);
+            return paged;
         }
 
-        [HttpGet("basic-info/paged/filter/basic")]
-        public async Task<IActionResult> GetAllEmployeesBasicFiltered([FromQuery] PaginationFilterBasic filter)
+        public async Task<PagedResponse<List<EmployeeBasicDataDto>>> GetAllEmployeesBasicFilteredPaged(
+            [FromQuery] PaginationFilterBasic filter, string? route)
         {
-            var route = Request.Path.Value;
             var paginationFilter = new PaginationFilterBasic(filter.PageNumber, filter.PageSize, filter.Search,
                 filter.OrderBy, filter.OrderByDesc);
             var query = paginationFilter.OrderByDesc
@@ -400,10 +384,9 @@ namespace Employees.Controllers
                                 : paginationFilter.Search.ToLower())).CountAsync();
             var paged = PaginationHelper.CreatePagedReponseBasic<EmployeeBasicDataDto>(query, paginationFilter,
                 totalRec, _uriService, route);
-            return Ok(paged);
+            return paged;
         }
 
-        [HttpGet("emails")]
         public async Task<ActionResult<ICollection<EmployeeEmailDto>>> GetAllEmployeesEmails()
         {
             return await _context.Employees.Select(p => new EmployeeEmailDto
@@ -414,7 +397,6 @@ namespace Employees.Controllers
             }).ToListAsync();
         }
 
-        [HttpGet("emails/filter")]
         public async Task<ActionResult<ICollection<EmployeeEmailDto>>> GetAllEmployeesEmailsFiltered(string? search)
         {
             return await _context.Employees
