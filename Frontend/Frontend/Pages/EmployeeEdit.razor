@@ -93,6 +93,8 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
                     <button type="submit" class="btn btn-primary">Change phone number</button>
                 </EditForm>
             </div>
+        </div>
+        <div class="col-6">
             <div class="mt-2">
                 <EditForm Model="EmailModel" OnValidSubmit="HandleEmailSubmit">
                     <DataAnnotationsValidator/>
@@ -134,36 +136,6 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
                         }
                     </div>
                     <button type="submit" class="btn btn-primary">Change gender</button>
-                </EditForm>
-            </div>
-        </div>
-        <!-- Address form -->
-        <div class="col-6">
-            <div class="mt-2">
-                <EditForm Model="AddressModel" OnValidSubmit="HandleAddressSubmit">
-                    <DataAnnotationsValidator/>
-                    <ValidationSummary/>
-                    <div class="form-group">
-                        <label for="street">Street address</label>
-                        <InputText id="street" @bind-Value="AddressModel.Street" class="form-control"></InputText>
-                    </div>
-                    <div class="form-group">
-                        <label for="zip">Zip code</label>
-                        <InputText id="zip" @bind-Value="AddressModel.ZipCode" class="form-control"></InputText>
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City name</label>
-                        <InputText id="city" @bind-Value="AddressModel.City" class="form-control"></InputText>
-                    </div>
-                    <div class="form-group">
-                        <label for="region">Region name</label>
-                        <InputText id="region" @bind-Value="AddressModel.Region" class="form-control"></InputText>
-                    </div>
-                    <div class="form-group">
-                        <label for="country">Country name</label>
-                        <InputText id="country" @bind-Value="AddressModel.Country" class="form-control"></InputText>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Change address</button>
                 </EditForm>
             </div>
         </div>
@@ -238,7 +210,6 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
     private PositionModel PositionModel { get; } = new();
     private SalaryModel SalaryModel { get; } = new();
     private GenderModel GenderModel { get; } = new();
-    private AddressEditModel AddressModel { get; } = new();
 
     private Employee _employee;
 
@@ -273,11 +244,6 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
             GenderModel.Gender = "Other";
             GenderModel.GenderInput = _employee.Gender;
         }
-        AddressModel.Street = _employee.Address.Street;
-        AddressModel.ZipCode = _employee.Address.ZipCode;
-        AddressModel.City = _employee.Address.City;
-        AddressModel.Region = _employee.Address.Region;
-        AddressModel.Country = _employee.Address.Country;
     }
 
     async void HandleNameSubmit()
@@ -346,15 +312,6 @@ box-shadow: 0px 0px 3px 0px rgba(66, 68, 90, 1)!important;
     async void HandleGenderSubmit()
     {
         var res = await _employeeService.EditGender(Id, GenderModel);
-        if (res.IsSuccessStatusCode)
-        {
-            _navigationManager.NavigateTo($"/edit-employee/{Id}", true);
-        }
-    }
-
-    async void HandleAddressSubmit()
-    {
-        var res = await _employeeService.EditAddress(Id, AddressModel);
         if (res.IsSuccessStatusCode)
         {
             _navigationManager.NavigateTo($"/edit-employee/{Id}", true);

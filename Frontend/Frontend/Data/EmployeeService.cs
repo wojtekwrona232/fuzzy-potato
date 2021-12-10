@@ -31,21 +31,21 @@ namespace Frontend.Data
         {
             var client = _clientFactory.CreateClient();
             return await client.GetFromJsonAsync<ICollection<EmployeeBasicDataDto>>(
-                new Uri("https://localhost:5001/api/EmployeeGet/basic-info"));
+                new Uri("https://localhost:5001/api/employees/get/basic-info"));
         }
 
         public async Task<BasicPaged> GetBasicPaged()
         {
             var client = _clientFactory.CreateClient();
             return await client.GetFromJsonAsync<BasicPaged>(
-                new Uri("https://localhost:5001/api/EmployeeGet/basic-info/paged"));
+                new Uri("https://localhost:5001/api/employees/get/basic-info/paged"));
         }
 
         public async Task<BasicPaged> GetBasicPaged(Uri uri)
         {
             var client = _clientFactory.CreateClient();
             return await client.GetFromJsonAsync<BasicPaged>(
-                uri ?? new Uri("https://localhost:5001/api/EmployeeGet/basic-info/paged"));
+                uri ?? new Uri("https://localhost:5001/api/employees/get/basic-info/paged"));
         }
 
         public Employee GetEmployeeInfo(Guid id)
@@ -53,25 +53,20 @@ namespace Frontend.Data
             var json = string.Empty;
             try
             {
-                json = new WebClient().DownloadString(new Uri($"https://localhost:5001/api/EmployeeGet/{id}"));
+                json = new WebClient().DownloadString(new Uri($"https://localhost:5001/api/employees/get/{id}"));
             }
             catch (Exception)
             {
+                // ignored
             }
 
             return JsonConvert.DeserializeObject<Employee>(json);
         }
 
-        public async Task<Employee> GetEmployeeInfoAsync(Guid id)
-        {
-            var client = _clientFactory.CreateClient();
-            return await client.GetFromJsonAsync<Employee>($"https://localhost:5001/api/EmployeeGet/{id}");
-        }
-
         public async Task<Employee> GetEmployee(Guid id)
         {
             var client = _clientFactory.CreateClient();
-            return await client.GetFromJsonAsync<Employee>($"https://localhost:5001/api/EmployeeGet/{id}");
+            return await client.GetFromJsonAsync<Employee>($"https://localhost:5001/api/employees/get/{id}");
         }
 
         public async Task<HttpResponseMessage> DeleteEmployee(Guid id)
@@ -87,7 +82,7 @@ namespace Frontend.Data
             var lastName = model.LastName;
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/name/{id}/{firstName}&{lastName}", null);
+                $"https://localhost:5001/api/employees/update/name/{id}/{firstName}&{lastName}", null);
             return resp;
         }
 
@@ -96,7 +91,7 @@ namespace Frontend.Data
             var value = model.DateOfBirth.ToString("yyyy-MM-dd");
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/dob/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/dob/{id}/{value}", null);
             return resp;
         }
 
@@ -105,7 +100,7 @@ namespace Frontend.Data
             var value = model.Date.ToString("yyyy-MM-dd");
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/date-hire/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/date-hire/{id}/{value}", null);
             return resp;
         }
 
@@ -114,7 +109,7 @@ namespace Frontend.Data
             var value = model.Date?.ToString("yyyy-MM-dd");
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/date-dismission/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/date-dismission/{id}/{value}", null);
             return resp;
         }
 
@@ -123,7 +118,7 @@ namespace Frontend.Data
             var value = model.PhoneNumber;
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/phone-number/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/phone-number/{id}/{value}", null);
             return resp;
         }
 
@@ -132,7 +127,7 @@ namespace Frontend.Data
             var value = model.Email;
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/email/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/email/{id}/{value}", null);
             return resp;
         }
 
@@ -141,7 +136,7 @@ namespace Frontend.Data
             var value = model.Position;
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/position/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/position/{id}/{value}", null);
             return resp;
         }
 
@@ -150,7 +145,7 @@ namespace Frontend.Data
             var value = model.Salary.ToString().Replace(",", ".");
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/salary/{id}/{value}", null);
+                $"https://localhost:5001/api/employees/update/salary/{id}/{value}", null);
             return resp;
         }
 
@@ -159,23 +154,7 @@ namespace Frontend.Data
             var value = model.GenderInput ?? model.Gender;
             var client = _clientFactory.CreateClient();
             var resp = await client.PutAsync(
-                $"https://localhost:5001/api/EmployeeUpdate/gender/{id}/{value}", null);
-            return resp;
-        }
-
-        public async Task<HttpResponseMessage> EditAddress(Guid id, AddressEditModel model)
-        {
-            var client = _clientFactory.CreateClient();
-            var builder = new UriBuilder($"https://localhost:5001/api/EmployeeUpdate/address/{id}");
-            var query = HttpUtility.ParseQueryString(builder.Query);
-            query["street"] = model.Street;
-            query["zipCode"] = model.ZipCode;
-            query["city"] = model.City;
-            query["region"] = model.Region;
-            query["country"] = model.Country;
-            builder.Query = query.ToString();
-            var uri = builder.ToString();
-            var resp = await client.PutAsync(uri, null);
+                $"https://localhost:5001/api/employees/update/gender/{id}/{value}", null);
             return resp;
         }
 
@@ -194,18 +173,10 @@ namespace Frontend.Data
                 DateOfHire = model.DateOfHire,
                 DateOfDismission = null,
                 Salary = model.Salary,
-                Position = model.Position,
-                Address = new Address
-                {
-                    Street = model.Street,
-                    ZipCode = model.ZipCode,
-                    City = model.City,
-                    Region = model.Region,
-                    Country = model.Country
-                }
+                Position = model.Position
             };
 
-            var result = await client.PostAsJsonAsync<Employee>("https://localhost:5001/api/EmployeeCreate/create", employee);
+            var result = await client.PostAsJsonAsync("https://localhost:5001/api/employees/create", employee);
 
             return result;
         }
@@ -213,7 +184,7 @@ namespace Frontend.Data
         public async Task<ICollection<EmployeeBasicDataDto>> GetBasicSearch(SimpleSearchModel model)
         {
             var client = _clientFactory.CreateClient();
-            var builder = new UriBuilder("https://localhost:5001/api/EmployeeGet/basic-info/filter/basic");
+            var builder = new UriBuilder("https://localhost:5001/api/employees/get/basic-info/filter/basic");
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["search"] = model.SearchValue;
             query["orderBy"] = model.OrderBy.ToString();
@@ -227,7 +198,7 @@ namespace Frontend.Data
         public async Task<BasicPaged> GetBasicSearchPaged(SimpleSearchModel model)
         {
             var client = _clientFactory.CreateClient();
-            var builder = new UriBuilder("https://localhost:5001/api/EmployeeGet/basic-info/paged/filter/basic");
+            var builder = new UriBuilder("https://localhost:5001/api/employees/get/basic-info/paged/filter/basic");
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["search"] = model.SearchValue;
             query["orderBy"] = model.OrderBy.ToString();
@@ -240,7 +211,7 @@ namespace Frontend.Data
         public async Task<ICollection<EmployeeBasicDataDto>> GetAdvancedSearch(AdvancedSearchModel model)
         {
             var client = _clientFactory.CreateClient();
-            var builder = new UriBuilder("https://localhost:5001/api/EmployeeGet/basic-info/filter/advanced");
+            var builder = new UriBuilder("https://localhost:5001/api/employees/get/basic-info/filter/advanced");
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["firstName"] = model.SearchValueFirstName;
             query["lastName"] = model.SearchValueLastName;
@@ -258,7 +229,7 @@ namespace Frontend.Data
         public async Task<BasicPaged> GetAdvancedSearchPaged(AdvancedSearchModel model)
         {
             var client = _clientFactory.CreateClient();
-            var builder = new UriBuilder("https://localhost:5001/api/EmployeeGet/basic-info/paged/filter/advanced");
+            var builder = new UriBuilder("https://localhost:5001/api/employees/get/basic-info/paged/filter/advanced");
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["firstName"] = model.SearchValueFirstName;
             query["lastName"] = model.SearchValueLastName;

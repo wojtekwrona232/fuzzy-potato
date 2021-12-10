@@ -32,7 +32,7 @@ namespace Employees.Controllers
             _getService = getService;
         }
 
-        [HttpPut("name/{id}/{firstName}&{lastName}")]
+        [HttpPut("update/name/{id}/{firstName}&{lastName}")]
         public async Task<ActionResult<Employee>> ChangeName(Guid id, string firstName, string lastName)
         {
             var reg = new Regex(@"^[A-Za-z ]{1,32}$");
@@ -45,7 +45,7 @@ namespace Employees.Controllers
             return result ?? NotFound();
         }
 
-        [HttpPut("gender/{id}/{gender}")]
+        [HttpPut("update/gender/{id}/{gender}")]
         public async Task<ActionResult<Employee>> ChangeGender(Guid id, string gender)
         {
             var reg = new Regex(@"^[A-Za-z- ]{1,20}$");
@@ -58,7 +58,7 @@ namespace Employees.Controllers
             return result ?? NotFound();
         }
 
-        [HttpPut("dob/{id}/{dob}")]
+        [HttpPut("update/dob/{id}/{dob}")]
         public async Task<ActionResult<Employee>> ChangeDob(Guid id,
             [DateOfBirth(MinAge = 15, MaxAge = 110)]
             DateTime dob)
@@ -67,21 +67,21 @@ namespace Employees.Controllers
             return result ?? NotFound();
         }
 
-        [HttpPut("date-hire/{id}/{date}")]
+        [HttpPut("update/date-hire/{id}/{date}")]
         public async Task<ActionResult<Employee>> ChangeDateHire(Guid id, [DateWithinMonth] DateTime date)
         {
             var result = await _updateService.ChangeDateHire(id, date);
             return result ?? NotFound();
         }
 
-        [HttpPut("date-dismission/{id}/{date}")]
+        [HttpPut("update/date-dismission/{id}/{date}")]
         public async Task<ActionResult<Employee>> ChangeDateDismission(Guid id, [DateWithinMonth] DateTime date)
         {
             var result = await _updateService.ChangeDateDismission(id, date);
             return result ?? NotFound();
         }
 
-        [HttpPut("salary/{id}/{value}")]
+        [HttpPut("update/salary/{id}/{value}")]
         public async Task<ActionResult<Employee>> ChangeSalary(Guid id, string value)
         {
             var v = value.Contains(",") ? value.Replace(",", ".") : value;
@@ -96,21 +96,21 @@ namespace Employees.Controllers
             return result ?? NotFound();
         }
 
-        [HttpPut("email/{id}/{email}")]
+        [HttpPut("update/email/{id}/{email}")]
         public async Task<ActionResult<Employee>> ChangeEmail(Guid id, [EmailAddress] string email)
         {
             var result = await _updateService.ChangeEmail(id, email);
             return result ?? NotFound();
         }
 
-        [HttpPut("phone-number/{id}/{phoneNumber}")]
+        [HttpPut("update/phone-number/{id}/{phoneNumber}")]
         public async Task<ActionResult<Employee>> ChangePhoneNumber(Guid id, [Phone] string phoneNumber)
         {
             var result = await _updateService.ChangePhoneNumber(id, phoneNumber);
             return result ?? NotFound();
         }
 
-        [HttpPut("position/{id}/{position}")]
+        [HttpPut("update/position/{id}/{position}")]
         public async Task<ActionResult<Employee>> ChangePosition(Guid id,
             [MinLength(1)] [MaxLength(64)] string position)
         {

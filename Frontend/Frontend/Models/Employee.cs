@@ -28,6 +28,5 @@ namespace Frontend.Models
 
         public string Position { get; set; }
 
-        public Address Address { get; set; }
     }
 }

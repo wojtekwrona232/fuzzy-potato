@@ -108,24 +108,6 @@ padding-left: 10px!important;
     <td>@_employee.Position</td>
 </tr>
 </tbody>
-<hr/>
-<h5>Address</h5>
-
-<div class="addresstext">
-    @_employee.Address.Street
-    <br/>
-    @_employee.Address.ZipCode @_employee.Address.City
-    <br/>
-    @if (string.IsNullOrWhiteSpace(_employee.Address.Region))
-    {
-        <p>@_employee.Address.Country</p>
-    }
-    else
-    {
-        <p>@_employee.Address.Region, @_employee.Address.Country</p>
-    }
-</div>
-
 <div class="container">
     <div class="btn-group" role="group" aria-label="switch">
       <button type="button" class="btn  but1" @onclick="(() => EditEmployee(Id))">Edit data</button>
