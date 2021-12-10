@@ -44,8 +44,6 @@ namespace Employees
                 .UseNpgsql($"Host={server};Port={port};Database={database};Username={user};Password={password}")
                 .UseSnakeCaseNamingConvention());
             services.AddHttpContextAccessor();
-
-            services.AddRouteAnalyzer();
             
             services.AddScoped<IGetService, GetService>();
             services.AddScoped<IUpdateService, UpdateService>();
