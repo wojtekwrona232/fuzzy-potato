@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using AspNetCore.RouteAnalyzer;
 using Employees.Services;
 using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
@@ -43,6 +44,8 @@ namespace Employees
                 .UseNpgsql($"Host={server};Port={port};Database={database};Username={user};Password={password}")
                 .UseSnakeCaseNamingConvention());
             services.AddHttpContextAccessor();
+
+            services.AddRouteAnalyzer();
             
             services.AddScoped<IGetService, GetService>();
             services.AddScoped<IUpdateService, UpdateService>();

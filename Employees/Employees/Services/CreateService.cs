@@ -18,12 +18,12 @@ namespace Employees.Services
 
         public async Task<ActionResult<Employee>> CreateEmployee(Employee employee)
         {
-            _context.Employees.Add(employee);
+            var entity = _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
             
             try
             {
-                return await _context.Employees.FirstOrDefaultAsync(p => p.Id == employee.Id);
+                return entity.Entity;
             }
             catch (Exception)
             {

@@ -128,7 +128,7 @@ namespace Employees.Controllers
         public async Task<ActionResult<Employee>> CreateEmployee(Employee employee)
         {
             var result = await _createService.CreateEmployee(employee);
-            return result ?? NotFound();
+            return Ok(result.Value);
         }
 
         [HttpDelete("remove/{id}")]
